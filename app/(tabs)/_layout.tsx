@@ -11,6 +11,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="radar"
         options={{
+          headerShown: false,
           tabBarIcon: ({ color, focused }) => (
             <MaterialIcons name="mode-of-travel" size={24} color={color} />
           ),
@@ -19,14 +20,16 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="postcards"
         options={{
+          headerShown: false,
           tabBarIcon: ({ color, focused }) => (
-            <Ionicons name="flower" size={24} color={color} />
+            <Ionicons name="image" size={24} color={color} />
           ),
         }}
       />
       <Tabs.Screen
         name="travelmates"
         options={{
+          headerShown: false,
           tabBarIcon: ({ color, focused }) => (
             <MaterialCommunityIcons
               name="bag-personal-plus"
@@ -39,6 +42,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="trails"
         options={{
+          headerShown: false,
           tabBarIcon: ({ color, focused }) => (
             <Ionicons name="footsteps" size={24} color={color} />
           ),
@@ -47,6 +51,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="interests"
         options={{
+          headerShown: false,
           tabBarIcon: ({ color, focused }) => (
             <MaterialCommunityIcons
               name="flower-tulip"
