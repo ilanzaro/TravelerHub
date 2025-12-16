@@ -4,6 +4,7 @@ import {
   MaterialIcons,
 } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
+import TabHeader from "../../components/TabHeader";
 
 export default function TabsLayout() {
   return (
@@ -12,7 +13,7 @@ export default function TabsLayout() {
         name="radar"
         options={{
           title: "Radar",
-          headerShown: false,
+          headerTitle: () => <TabHeader placeholder="Search destinations..." />,
           tabBarIcon: ({ color, focused }) => (
             <MaterialIcons name="mode-of-travel" size={24} color={color} />
           ),
@@ -22,7 +23,7 @@ export default function TabsLayout() {
         name="travelmates"
         options={{
           title: "Travelmates",
-          headerShown: false,
+          headerTitle: () => <TabHeader placeholder="Search travelmates..." />,
           tabBarIcon: ({ color, focused }) => (
             <MaterialCommunityIcons
               name="bag-personal-plus"
@@ -36,7 +37,7 @@ export default function TabsLayout() {
         name="postcards"
         options={{
           title: "Postcards",
-          headerShown: false,
+          headerTitle: () => <TabHeader placeholder="Search postcards..." />,
           tabBarIcon: ({ color, focused }) => (
             <Ionicons name="image" size={24} color={color} />
           ),
@@ -45,6 +46,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="directs"
         options={{
+          href: null,
           title: "Directs",
           headerShown: false,
           tabBarIcon: ({ color, focused }) => (
@@ -56,7 +58,7 @@ export default function TabsLayout() {
         name="interests"
         options={{
           title: "Interests",
-          headerShown: false,
+          headerTitle: () => <TabHeader placeholder="Search interests..." />,
           tabBarIcon: ({ color, focused }) => (
             <MaterialCommunityIcons
               name="flower-tulip"
@@ -70,7 +72,7 @@ export default function TabsLayout() {
         name="trails"
         options={{
           title: "Trails",
-          headerShown: false,
+          headerTitle: () => <TabHeader placeholder="Search trails..." />,
           tabBarIcon: ({ color, focused }) => (
             <Ionicons name="footsteps" size={24} color={color} />
           ),
