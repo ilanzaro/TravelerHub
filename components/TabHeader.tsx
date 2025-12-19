@@ -44,10 +44,12 @@ export default function TabHeader({
 
 const styles = StyleSheet.create({
   headerContainer: {
+    flex: 1,
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: 12,
     gap: 12,
+    width: "100%",
   },
   searchInput: {
     flex: 1,

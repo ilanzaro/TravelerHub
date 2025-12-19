@@ -4,7 +4,7 @@ import {
   MaterialIcons,
 } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
-import { useColorScheme } from "react-native";
+import { StyleSheet, useColorScheme } from "react-native";
 import TabHeader from "../../components/TabHeader";
 import { Colors } from "../constants/colors";
 
@@ -17,6 +17,7 @@ export default function TabsLayout() {
         headerTintColor: theme.text,
         headerStyle: { backgroundColor: theme.navBackground },
         headerTitleStyle: { color: theme.title },
+        headerTitleContainerStyle: styles.headerTitleContainer,
         tabBarInactiveTintColor: theme.icon,
         tabBarActiveTintColor: theme.iconFocused,
         tabBarStyle: { backgroundColor: theme.navBackground },
@@ -98,3 +99,11 @@ export default function TabsLayout() {
     </Tabs>
   );
 }
+
+const styles = StyleSheet.create({
+  headerTitleContainer: {
+    width: "100%",
+    left: 0,
+    right: 0,
+  },
+});
