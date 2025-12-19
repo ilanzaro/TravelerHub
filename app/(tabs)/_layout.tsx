@@ -4,18 +4,35 @@ import {
   MaterialIcons,
 } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
+import { useColorScheme } from "react-native";
 import TabHeader from "../../components/TabHeader";
+import { Colors } from "../constants/colors";
 
 export default function TabsLayout() {
+  const colorScheme = useColorScheme();
+  const theme = Colors[colorScheme ?? "dark"];
   return (
-    <Tabs>
+    <Tabs
+      screenOptions={{
+        headerTintColor: theme.text,
+        headerStyle: { backgroundColor: theme.navBackground },
+        headerTitleStyle: { color: theme.title },
+        tabBarInactiveTintColor: theme.icon,
+        tabBarActiveTintColor: theme.iconFocused,
+        tabBarStyle: { backgroundColor: theme.navBackground },
+      }}
+    >
       <Tabs.Screen
         name="radar"
         options={{
           title: "Radar",
           headerTitle: () => <TabHeader placeholder="Search destinations..." />,
-          tabBarIcon: ({ color, focused }) => (
-            <MaterialIcons name="mode-of-travel" size={24} color={color} />
+          tabBarIcon: ({ focused }) => (
+            <MaterialIcons
+              name="mode-of-travel"
+              size={24}
+              color={focused ? theme.iconFocused : theme.icon}
+            />
           ),
         }}
       />
@@ -47,8 +64,8 @@ export default function TabsLayout() {
         name="directs"
         options={{
           href: null,
-          title: "Directs",
-          headerShown: false,
+          //title: "Directs",
+          headerTitle: () => <TabHeader placeholder="Search postcards..." />,
           tabBarIcon: ({ color, focused }) => (
             <Ionicons name="chatbox-ellipses" size={24} color={color} />
           ),
