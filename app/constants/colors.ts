@@ -6,7 +6,7 @@ export const Colors = {
     background: "#cffafe",
     navBackground: "#ccfbf1",
     icon: "#134e4a",
-    iconFocused: "#bef264",
+    iconFocused: "#4d7c0f",
   },
   dark: {
     title: "#f0fdfa",
