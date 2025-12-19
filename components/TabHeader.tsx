@@ -1,7 +1,7 @@
 import { Colors } from "@/app/constants/colors";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
-import React from "react";
+import React, { useState } from "react";
 import {
   StyleSheet,
   TextInput,
@@ -9,6 +9,7 @@ import {
   useColorScheme,
   View,
 } from "react-native";
+import MenuDropdown, { MenuOption } from "./MenuDropdown";
 
 interface TabHeaderProps {
   onSearchChange?: (text: string) => void;
@@ -23,14 +24,54 @@ export default function TabHeader({
 }: TabHeaderProps) {
   const colorScheme = useColorScheme();
   const theme = Colors[colorScheme ?? "dark"];
+  const [showDropdown, setShowDropdown] = useState(false);
 
   const handleDirectsPress = () => {
     router.push("/directs");
   };
 
+  const handleProfilePress = () => {
+    setShowDropdown(!showDropdown);
+  };
+
+  const menuOptions: MenuOption[] = [
+    {
+      id: "profile",
+      label: "Profile",
+      icon: "person",
+      onPress: () => router.push("/(settings)/profile-edit"),
+    },
+    {
+      id: "settings",
+      label: "Settings",
+      icon: "settings",
+      onPress: () => {
+        // Add settings navigation
+      },
+    },
+    {
+      id: "logout",
+      label: "Logout",
+      icon: "log-out",
+      onPress: () => {
+        // Add logout logic
+      },
+    },
+  ];
+
   return (
     <View style={styles.headerContainer}>
-      <Ionicons name="person-circle" size={24} color={theme.icon} />
+      <View style={styles.menuContainer}>
+        <TouchableOpacity onPress={handleProfilePress}>
+          <Ionicons name="person-circle" size={24} color={theme.icon} />
+        </TouchableOpacity>
+
+        <MenuDropdown
+          visible={showDropdown}
+          onClose={() => setShowDropdown(false)}
+          options={menuOptions}
+        />
+      </View>
       <Ionicons name="search" size={24} color={theme.icon} />
       <TextInput
         style={styles.searchInput}
@@ -60,5 +101,8 @@ const styles = StyleSheet.create({
     flex: 1,
     height: 36,
     paddingHorizontal: 8,
+  },
+  menuContainer: {
+    position: "relative",
   },
 });
