@@ -13,14 +13,17 @@ import {
 interface TabHeaderProps {
   onSearchChange?: (text: string) => void;
   placeholder?: string;
+  navIcon?: React.ReactNode;
 }
 
 export default function TabHeader({
   onSearchChange,
   placeholder = "Search...",
+  navIcon,
 }: TabHeaderProps) {
   const colorScheme = useColorScheme();
   const theme = Colors[colorScheme ?? "dark"];
+
   const handleDirectsPress = () => {
     router.push("/directs");
   };
@@ -35,9 +38,11 @@ export default function TabHeader({
         placeholderTextColor={theme.text}
         onChangeText={onSearchChange}
       />
-      <TouchableOpacity onPress={handleDirectsPress}>
-        <Ionicons name="chatbox-ellipses" size={24} color={theme.icon} />
-      </TouchableOpacity>
+      {navIcon && (
+        <TouchableOpacity onPress={handleDirectsPress}>
+          {navIcon}
+        </TouchableOpacity>
+      )}
     </View>
   );
 }
