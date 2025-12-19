@@ -21,6 +21,7 @@ export default function Login() {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleLogin = async () => {
+    router.replace("/(tabs)/radar");
     if (!email.trim() || !password.trim()) {
       Alert.alert("Error", "Please fill in all fields");
       return;
