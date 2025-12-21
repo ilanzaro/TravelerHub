@@ -24,12 +24,12 @@ export default function Index() {
   return (
     <View style={[styles.container, { backgroundColor: theme.background }]}>
       <View style={styles.content}>
-        <Text style={[styles.title, { color: theme.title }]}>TravelerHub</Text>
-        <LogoSVG width={150} height={150} />
-        <Text style={[styles.subtitle, { color: theme.text }]}>
-          Connect with travelers around the world
-        </Text>
-
+        <View style={styles.logoPlaceholder}>
+          <LogoSVG height={250} width={250} fill={theme.text} />
+          <Text style={[styles.subtitle, { color: theme.text }]}>
+            Connect with travelers around the world
+          </Text>
+        </View>
         <View style={styles.buttonContainer}>
           <TouchableOpacity
             style={[styles.button, { backgroundColor: theme.iconFocused }]}
@@ -67,6 +67,11 @@ const styles = StyleSheet.create({
   content: {
     alignItems: "center",
     paddingHorizontal: 32,
+    width: "100%",
+  },
+  logoPlaceholder: {
+    alignItems: "center",
+    gap: 20,
     width: "100%",
   },
   title: {
