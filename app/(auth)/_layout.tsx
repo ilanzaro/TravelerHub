@@ -12,16 +12,12 @@ export default function AuthLayout() {
         headerTitleStyle: { color: theme.title },
         headerTintColor: theme.icon,
         contentStyle: { backgroundColor: theme.background },
+        headerTitle: "",
+        headerBackTitle: "",
       }}
     >
-      <Stack.Screen
-        name="login"
-        options={{ title: "Login", headerTitle: "TravelerHub" }}
-      />
-      <Stack.Screen
-        name="register"
-        options={{ title: "Register", headerTitle: "TravelerHub" }}
-      />
+      <Stack.Screen name="login" />
+      <Stack.Screen name="register" />
     </Stack>
   );
 }

@@ -16,10 +16,7 @@ export default function RootLayout() {
           contentStyle: { backgroundColor: theme.background },
         }}
       >
-        <Stack.Screen
-          name="index"
-          options={{ title: "Home", headerTitle: "TravelerHub" }}
-        />
+        <Stack.Screen name="index" options={{ headerShown: false }} />
         <Stack.Screen name="(auth)" options={{ headerShown: false }} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="(settings)" options={{ headerShown: false }} />
