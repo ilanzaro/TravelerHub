@@ -6,6 +6,7 @@ import {
   useColorScheme,
   View,
 } from "react-native";
+import LogoSVG from "../assets/svg/travel-hub.svg";
 import { Colors } from "./constants/colors";
 
 export default function Index() {
@@ -24,6 +25,7 @@ export default function Index() {
     <View style={[styles.container, { backgroundColor: theme.background }]}>
       <View style={styles.content}>
         <Text style={[styles.title, { color: theme.title }]}>TravelerHub</Text>
+        <LogoSVG width={150} height={150} />
         <Text style={[styles.subtitle, { color: theme.text }]}>
           Connect with travelers around the world
         </Text>
