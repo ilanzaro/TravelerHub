@@ -95,7 +95,7 @@ export default function Register() {
         <View
           style={[
             styles.card,
-            { backgroundColor: theme.navBackground, borderColor: theme.icon },
+            { backgroundColor: theme.formBackground, borderColor: theme.icon },
           ]}
         >
           <Text style={[styles.cardTitle, { color: theme.title }]}>
@@ -199,7 +199,7 @@ export default function Register() {
         <View
           style={[
             styles.card,
-            { backgroundColor: theme.navBackground, borderColor: theme.icon },
+            { backgroundColor: theme.formBackground, borderColor: theme.icon },
           ]}
         >
           <Text style={[styles.cardTitle, { color: theme.title }]}>
@@ -232,7 +232,7 @@ export default function Register() {
         <View
           style={[
             styles.card,
-            { backgroundColor: theme.navBackground, borderColor: theme.icon },
+            { backgroundColor: theme.formBackground, borderColor: theme.icon },
           ]}
         >
           <Text style={[styles.cardTitle, { color: theme.title }]}>

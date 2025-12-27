@@ -69,15 +69,15 @@ export default function Login() {
               style={[
                 styles.input,
                 {
-                  backgroundColor: theme.navBackground,
+                  backgroundColor: theme.formBackground,
                   borderColor: theme.icon,
-                  color: theme.text,
+                  color: theme.formText,
                 },
               ]}
               value={email}
               onChangeText={setEmail}
               placeholder="Enter your email"
-              placeholderTextColor={theme.text + "80"}
+              placeholderTextColor={theme.formText + "80"}
               keyboardType="email-address"
               autoCapitalize="none"
               autoCorrect={false}
@@ -91,9 +91,9 @@ export default function Login() {
               style={[
                 styles.input,
                 {
-                  backgroundColor: theme.navBackground,
+                  backgroundColor: theme.formBackground,
                   borderColor: theme.icon,
-                  color: theme.text,
+                  color: theme.formText,
                 },
               ]}
               value={password}
