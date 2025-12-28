@@ -1,15 +1,19 @@
 //tailwind colors - https://tailscan.com/colors
-const radixColors = {
+//light Accent: ECFEFF Gray: ECFEFF Background: ECFEFF
+//dark Accent: 083344 Gray: 083344 Background: 042F2E
+export const radixColors = {
   light: {
-    backgroud: {
+    background: {
       1: "#ECFEFF",
       2: "#F0F9F9",
       3: "#E5F7F8",
       4: "#EAFBFC",
+      5: "#EAFBFC",
       "alpha-1": "#FFE7E336",
       "alpha-2": "#FFE7E336",
       "alpha-3": "#0D1F2008",
       "alpha-4": "#6D3F4004",
+      "alpha-5": "#6D3F4004",
     },
     interactive: {
       1: "#D6F1F3",
@@ -61,17 +65,17 @@ const radixColors = {
     },
   },
   dark: {
-    backgroud: {
-      1: "#212A2E",
-      2: "#242E32",
-      3: "#1B2B33",
-      4: "#203139",
-      5: "#042F2E",
-      "alpha-1": "#FA052E1E",
-      "alpha-2": "#FC284D21",
-      "alpha-3": "#F9056418",
-      "alpha-4": "#FA418F1D",
-      "alpha-5": "#05474820",
+    background: {
+      1: "#042F2E",
+      2: "#212A2E",
+      3: "#242E32",
+      4: "#1B2B33",
+      5: "#203139",
+      "alpha-1": "#05474820",
+      "alpha-2": "#FA052E1E",
+      "alpha-3": "#FC284D21",
+      "alpha-4": "#F9056418",
+      "alpha-5": "#FA418F1D",
     },
     interactive: {
       1: "#233C49",
@@ -124,6 +128,7 @@ const radixColors = {
   },
 };
 
+/* // Legacy Colors object kept for backward compatibility during migration
 export const Colors = {
   light: {
     title: "#083344",
@@ -173,3 +178,4 @@ export const Colors = {
     icon: "#064e3b",
   },
 };
+ */

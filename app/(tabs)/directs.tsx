@@ -1,13 +1,13 @@
 import React from "react";
 import { StyleSheet, Text, View, useColorScheme } from "react-native";
-import { Colors } from "../constants/colors";
+import { radixColors } from "../constants/colors";
 
 export default function Directs() {
   const colorScheme = useColorScheme();
-  const theme = Colors[colorScheme ?? "light"];
+  const theme = radixColors[colorScheme ?? "light"];
 
   return (
-    <View style={[styles.container, { backgroundColor: theme.background }]}>
+    <View style={[styles.container, { backgroundColor: theme.background[1] }]}>
       <Text>Directs</Text>
     </View>
   );

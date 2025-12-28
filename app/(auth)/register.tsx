@@ -12,11 +12,11 @@ import {
   useColorScheme,
   View,
 } from "react-native";
-import { Colors } from "../constants/colors";
+import { radixColors } from "../constants/colors";
 
 export default function Register() {
   const colorScheme = useColorScheme();
-  const theme = Colors[colorScheme ?? "dark"];
+  const theme = radixColors[colorScheme ?? "dark"];
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [repeatPassword, setRepeatPassword] = useState("");
@@ -68,7 +68,7 @@ export default function Register() {
 
   return (
     <KeyboardAvoidingView
-      style={[styles.container, { backgroundColor: theme.background }]}
+      style={[styles.container, { backgroundColor: theme.background[1] }]}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <ScrollView
@@ -78,15 +78,15 @@ export default function Register() {
       >
         <View style={styles.header}>
           <TouchableOpacity onPress={handleBackToLogin}>
-            <Text style={[styles.backButton, { color: theme.iconFocused }]}>
+            <Text style={[styles.backButton, { color: theme.solid[2] }]}>
               ← Return to login
             </Text>
           </TouchableOpacity>
 
-          <Text style={[styles.title, { color: theme.title }]}>
+          <Text style={[styles.title, { color: theme.text[4] }]}>
             Create Account
           </Text>
-          <Text style={[styles.subtitle, { color: theme.text }]}>
+          <Text style={[styles.subtitle, { color: theme.text[1] }]}>
             Join the TravelerHub community
           </Text>
         </View>
@@ -95,28 +95,28 @@ export default function Register() {
         <View
           style={[
             styles.card,
-            { backgroundColor: theme.formBackground, borderColor: theme.icon },
+            { backgroundColor: theme.interactive[2], borderColor: theme.border[3] },
           ]}
         >
-          <Text style={[styles.cardTitle, { color: theme.title }]}>
+          <Text style={[styles.cardTitle, { color: theme.text[4] }]}>
             Required Information *
           </Text>
 
           <View style={styles.inputContainer}>
-            <Text style={[styles.label, { color: theme.text }]}>Email *</Text>
+            <Text style={[styles.label, { color: theme.text[1] }]}>Email *</Text>
             <TextInput
               style={[
                 styles.input,
                 {
-                  backgroundColor: theme.background,
-                  borderColor: theme.icon,
-                  color: theme.text,
+                  backgroundColor: theme.background[1],
+                  borderColor: theme.border[2],
+                  color: theme.text[2],
                 },
               ]}
               value={email}
               onChangeText={setEmail}
               placeholder="Enter your email"
-              placeholderTextColor={theme.text + "80"}
+              placeholderTextColor={theme.text["alpha-1"]}
               keyboardType="email-address"
               autoCapitalize="none"
               autoCorrect={false}
@@ -125,44 +125,44 @@ export default function Register() {
           </View>
 
           <View style={styles.inputContainer}>
-            <Text style={[styles.label, { color: theme.text }]}>
+            <Text style={[styles.label, { color: theme.text[1] }]}>
               Nickname *
             </Text>
             <TextInput
               style={[
                 styles.input,
                 {
-                  backgroundColor: theme.background,
-                  borderColor: theme.icon,
-                  color: theme.text,
+                  backgroundColor: theme.background[1],
+                  borderColor: theme.border[2],
+                  color: theme.text[2],
                 },
               ]}
               value={nickname}
               onChangeText={setNickname}
               placeholder="Choose a nickname"
-              placeholderTextColor={theme.text + "80"}
+              placeholderTextColor={theme.text["alpha-1"]}
               autoCapitalize="none"
               editable={!isLoading}
             />
           </View>
 
           <View style={styles.inputContainer}>
-            <Text style={[styles.label, { color: theme.text }]}>
+            <Text style={[styles.label, { color: theme.text[1] }]}>
               Password *
             </Text>
             <TextInput
               style={[
                 styles.input,
                 {
-                  backgroundColor: theme.background,
-                  borderColor: theme.icon,
-                  color: theme.text,
+                  backgroundColor: theme.background[1],
+                  borderColor: theme.border[2],
+                  color: theme.text[2],
                 },
               ]}
               value={password}
               onChangeText={setPassword}
               placeholder="Create a password"
-              placeholderTextColor={theme.text + "80"}
+              placeholderTextColor={theme.text["alpha-1"]}
               secureTextEntry
               autoCapitalize="none"
               autoCorrect={false}
@@ -171,22 +171,22 @@ export default function Register() {
           </View>
 
           <View style={styles.inputContainer}>
-            <Text style={[styles.label, { color: theme.text }]}>
+            <Text style={[styles.label, { color: theme.text[1] }]}>
               Repeat Password *
             </Text>
             <TextInput
               style={[
                 styles.input,
                 {
-                  backgroundColor: theme.background,
-                  borderColor: theme.icon,
-                  color: theme.text,
+                  backgroundColor: theme.background[1],
+                  borderColor: theme.border[2],
+                  color: theme.text[2],
                 },
               ]}
               value={repeatPassword}
               onChangeText={setRepeatPassword}
               placeholder="Repeat your password"
-              placeholderTextColor={theme.text + "80"}
+              placeholderTextColor={theme.text["alpha-1"]}
               secureTextEntry
               autoCapitalize="none"
               autoCorrect={false}
@@ -199,28 +199,28 @@ export default function Register() {
         <View
           style={[
             styles.card,
-            { backgroundColor: theme.formBackground, borderColor: theme.icon },
+            { backgroundColor: theme.interactive[2], borderColor: theme.border[3] },
           ]}
         >
-          <Text style={[styles.cardTitle, { color: theme.title }]}>
+          <Text style={[styles.cardTitle, { color: theme.text[4] }]}>
             Date of Birth
           </Text>
 
           <View style={styles.inputContainer}>
-            <Text style={[styles.label, { color: theme.text }]}>Birthday</Text>
+            <Text style={[styles.label, { color: theme.text[1] }]}>Birthday</Text>
             <TextInput
               style={[
                 styles.input,
                 {
-                  backgroundColor: theme.background,
-                  borderColor: theme.icon,
-                  color: theme.text,
+                  backgroundColor: theme.background[1],
+                  borderColor: theme.border[2],
+                  color: theme.text[2],
                 },
               ]}
               value={dateString}
               onChangeText={handleDateChange}
               placeholder="YYYY-MM-DD"
-              placeholderTextColor={theme.text + "80"}
+              placeholderTextColor={theme.text["alpha-1"]}
               keyboardType="numeric"
               maxLength={10}
               editable={!isLoading}
@@ -232,47 +232,47 @@ export default function Register() {
         <View
           style={[
             styles.card,
-            { backgroundColor: theme.formBackground, borderColor: theme.icon },
+            { backgroundColor: theme.interactive[2], borderColor: theme.border[3] },
           ]}
         >
-          <Text style={[styles.cardTitle, { color: theme.title }]}>
+          <Text style={[styles.cardTitle, { color: theme.text[4] }]}>
             Additional Information (Optional)
           </Text>
 
           <View style={styles.inputContainer}>
-            <Text style={[styles.label, { color: theme.text }]}>Location</Text>
+            <Text style={[styles.label, { color: theme.text[1] }]}>Location</Text>
             <TextInput
               style={[
                 styles.input,
                 {
-                  backgroundColor: theme.background,
-                  borderColor: theme.icon,
-                  color: theme.text,
+                  backgroundColor: theme.background[1],
+                  borderColor: theme.border[2],
+                  color: theme.text[2],
                 },
               ]}
               value={location}
               onChangeText={setLocation}
               placeholder="Where are you from?"
-              placeholderTextColor={theme.text + "80"}
+              placeholderTextColor={theme.text["alpha-1"]}
               editable={!isLoading}
             />
           </View>
 
           <View style={styles.inputContainer}>
-            <Text style={[styles.label, { color: theme.text }]}>Bio</Text>
+            <Text style={[styles.label, { color: theme.text[1] }]}>Bio</Text>
             <TextInput
               style={[
                 styles.textArea,
                 {
-                  backgroundColor: theme.background,
-                  borderColor: theme.icon,
-                  color: theme.text,
+                  backgroundColor: theme.background[1],
+                  borderColor: theme.border[2],
+                  color: theme.text[2],
                 },
               ]}
               value={bio}
               onChangeText={setBio}
               placeholder="Tell us about yourself..."
-              placeholderTextColor={theme.text + "80"}
+              placeholderTextColor={theme.text["alpha-1"]}
               multiline
               numberOfLines={3}
               editable={!isLoading}
@@ -283,26 +283,26 @@ export default function Register() {
         <TouchableOpacity
           style={[
             styles.registerButton,
-            { backgroundColor: theme.iconFocused },
+            { backgroundColor: theme.solid[2] },
             isLoading && styles.disabledButton,
           ]}
           onPress={handleRegister}
           disabled={isLoading}
         >
           <Text
-            style={[styles.registerButtonText, { color: theme.background }]}
+            style={[styles.registerButtonText, { color: theme.background[1] }]}
           >
             {isLoading ? "Creating Account..." : "Create Account"}
           </Text>
         </TouchableOpacity>
 
         <View style={styles.footer}>
-          <Text style={[styles.footerText, { color: theme.text }]}>
+          <Text style={[styles.footerText, { color: theme.text[1] }]}>
             Already have an account?{" "}
           </Text>
           <Link href="/(auth)/login" asChild>
             <TouchableOpacity>
-              <Text style={[styles.linkText, { color: theme.iconFocused }]}>
+              <Text style={[styles.linkText, { color: theme.solid[2] }]}>
                 Sign in
               </Text>
             </TouchableOpacity>

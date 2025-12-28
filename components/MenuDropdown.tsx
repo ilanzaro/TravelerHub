@@ -1,4 +1,4 @@
-import { Colors } from "@/app/constants/colors";
+import { radixColors } from "@/app/constants/colors";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import {
@@ -29,7 +29,7 @@ export default function MenuDropdown({
   options,
 }: MenuDropdownProps) {
   const colorScheme = useColorScheme();
-  const theme = Colors[colorScheme ?? "dark"];
+  const theme = radixColors[colorScheme ?? "dark"];
 
   const handleOptionPress = (option: MenuOption) => {
     onClose();
@@ -46,7 +46,7 @@ export default function MenuDropdown({
       <TouchableOpacity
         style={[
           styles.modalOverlay,
-          { backgroundColor: theme.background + "88" },
+          { backgroundColor: theme.background["alpha-3"] },
         ]}
         activeOpacity={1}
         onPress={onClose}
@@ -55,9 +55,9 @@ export default function MenuDropdown({
           style={[
             styles.dropdown,
             {
-              backgroundColor: theme.navBackground,
-              borderColor: theme.icon,
-              shadowColor: theme.text,
+              backgroundColor: theme.background[4],
+              borderColor: theme.border[2],
+              shadowColor: theme.text[3],
             },
           ]}
         >
@@ -70,9 +70,9 @@ export default function MenuDropdown({
               <Ionicons
                 name={option.icon as any}
                 size={16}
-                color={theme.icon}
+                color={theme.solid[1]}
               />
-              <Text style={[styles.dropdownText, { color: theme.text }]}>
+              <Text style={[styles.dropdownText, { color: theme.text[1] }]}>
                 {option.label}
               </Text>
             </TouchableOpacity>

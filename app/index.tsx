@@ -7,11 +7,11 @@ import {
   View,
 } from "react-native";
 import LogoSVG from "../assets/svg/travel-hub.svg";
-import { Colors } from "./constants/colors";
+import { radixColors } from "./constants/colors";
 
 export default function Index() {
   const colorScheme = useColorScheme();
-  const theme = Colors[colorScheme ?? "dark"];
+  const theme = radixColors[colorScheme ?? "dark"];
 
   const handleLoginPress = () => {
     router.push("/(auth)/login");
@@ -22,20 +22,20 @@ export default function Index() {
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: theme.background }]}>
+    <View style={[styles.container, { backgroundColor: theme.background[1] }]}>
       <View style={styles.content}>
         <View style={styles.logoPlaceholder}>
-          <LogoSVG height={250} width={250} fill={theme.text} />
-          <Text style={[styles.subtitle, { color: theme.text }]}>
+          <LogoSVG height={250} width={250} fill={theme.text[2]} />
+          <Text style={[styles.subtitle, { color: theme.text[1] }]}>
             Connect with travelers around the world
           </Text>
         </View>
         <View style={styles.buttonContainer}>
           <TouchableOpacity
-            style={[styles.button, { backgroundColor: theme.iconFocused }]}
+            style={[styles.button, { backgroundColor: theme.solid[2] }]}
             onPress={handleLoginPress}
           >
-            <Text style={[styles.buttonText, { color: theme.background }]}>
+            <Text style={[styles.buttonText, { color: theme.background[1] }]}>
               Login
             </Text>
           </TouchableOpacity>
@@ -44,11 +44,11 @@ export default function Index() {
             style={[
               styles.button,
               styles.secondaryButton,
-              { borderColor: theme.iconFocused },
+              { borderColor: theme.solid[2] },
             ]}
             onPress={handleRegisterPress}
           >
-            <Text style={[styles.buttonText, { color: theme.iconFocused }]}>
+            <Text style={[styles.buttonText, { color: theme.solid[2] }]}>
               Register
             </Text>
           </TouchableOpacity>

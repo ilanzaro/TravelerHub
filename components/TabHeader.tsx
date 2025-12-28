@@ -1,4 +1,4 @@
-import { Colors } from "@/app/constants/colors";
+import { radixColors } from "@/app/constants/colors";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React, { useState } from "react";
@@ -23,7 +23,7 @@ export default function TabHeader({
   navIcon,
 }: TabHeaderProps) {
   const colorScheme = useColorScheme();
-  const theme = Colors[colorScheme ?? "dark"];
+  const theme = radixColors[colorScheme ?? "dark"];
   const [showDropdown, setShowDropdown] = useState(false);
 
   const handleDirectsPress = () => {
@@ -63,7 +63,7 @@ export default function TabHeader({
     <View style={styles.headerContainer}>
       <View style={styles.menuContainer}>
         <TouchableOpacity onPress={handleProfilePress}>
-          <Ionicons name="person-circle" size={24} color={theme.icon} />
+          <Ionicons name="person-circle" size={24} color={theme.solid[1]} />
         </TouchableOpacity>
 
         <MenuDropdown
@@ -72,11 +72,11 @@ export default function TabHeader({
           options={menuOptions}
         />
       </View>
-      <Ionicons name="search" size={24} color={theme.icon} />
+      <Ionicons name="search" size={24} color={theme.solid[1]} />
       <TextInput
         style={styles.searchInput}
         placeholder={placeholder}
-        placeholderTextColor={theme.text}
+        placeholderTextColor={theme.text[1]}
         onChangeText={onSearchChange}
       />
       {navIcon && (

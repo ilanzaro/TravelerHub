@@ -6,25 +6,25 @@ import {
 import { Tabs, usePathname } from "expo-router";
 import { StyleSheet, useColorScheme } from "react-native";
 import TabHeader from "../../components/TabHeader";
-import { Colors } from "../constants/colors";
+import { radixColors } from "../constants/colors";
 
 export default function TabsLayout() {
   const colorScheme = useColorScheme();
-  const theme = Colors[colorScheme ?? "dark"];
+  const theme = radixColors[colorScheme ?? "dark"];
   const pathname = usePathname();
   const isDirectsRoute = pathname === "/directs";
-  const chatboxColor = isDirectsRoute ? theme.iconFocused : theme.icon;
+  const chatboxColor = isDirectsRoute ? theme.solid[2] : theme.solid[1];
 
   return (
     <Tabs
       screenOptions={{
-        headerTintColor: theme.text,
-        headerStyle: { backgroundColor: theme.navBackground },
-        headerTitleStyle: { color: theme.title },
+        headerTintColor: theme.text[1],
+        headerStyle: { backgroundColor: theme.background[4] },
+        headerTitleStyle: { color: theme.text[4] },
         headerTitleContainerStyle: styles.headerTitleContainer,
-        tabBarInactiveTintColor: theme.icon,
-        tabBarActiveTintColor: theme.iconFocused,
-        tabBarStyle: { backgroundColor: theme.navBackground },
+        tabBarInactiveTintColor: theme.solid[1],
+        tabBarActiveTintColor: theme.solid[2],
+        tabBarStyle: { backgroundColor: theme.background[4] },
       }}
     >
       <Tabs.Screen
