@@ -1,3 +1,4 @@
+import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import {
   StyleSheet,
@@ -22,7 +23,12 @@ export default function Index() {
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: theme.background[1] }]}>
+    <LinearGradient
+      colors={[theme.background[3], theme.background[1]]}
+      style={styles.container}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 0, y: 1 }}
+    >
       <View style={styles.content}>
         <View style={styles.logoPlaceholder}>
           <LogoSVG height={250} width={250} fill={theme.text[2]} />
@@ -54,7 +60,7 @@ export default function Index() {
           </TouchableOpacity>
         </View>
       </View>
-    </View>
+    </LinearGradient>
   );
 }
 

@@ -1,3 +1,4 @@
+import { LinearGradient } from "expo-linear-gradient";
 import { Link, router } from "expo-router";
 import React, { useState } from "react";
 import {
@@ -52,102 +53,111 @@ export default function Login() {
   };
 
   return (
-    <KeyboardAvoidingView
-      style={[styles.container, { backgroundColor: theme.background[1] }]}
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
+    <LinearGradient
+      colors={[theme.background[3], theme.background[1]]}
+      style={styles.container}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 0, y: 1 }}
     >
-      <View style={styles.content}>
-        <Text style={[styles.title, { color: theme.text[4] }]}>
-          Welcome Back
-        </Text>
-        <Text style={[styles.subtitle, { color: theme.text[1] }]}>
-          Sign in to your account
-        </Text>
+      <KeyboardAvoidingView
+        style={styles.container}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+      >
+        <View style={styles.content}>
+          <Text style={[styles.title, { color: theme.text[4] }]}>
+            Welcome Back
+          </Text>
+          <Text style={[styles.subtitle, { color: theme.text[1] }]}>
+            Sign in to your account
+          </Text>
 
-        <View style={styles.form}>
-          <View style={styles.inputContainer}>
-            <Text style={[styles.label, { color: theme.text[1] }]}>Email</Text>
-            <TextInput
+          <View style={styles.form}>
+            <View style={styles.inputContainer}>
+              <Text style={[styles.label, { color: theme.text[1] }]}>
+                Email
+              </Text>
+              <TextInput
+                style={[
+                  styles.input,
+                  {
+                    backgroundColor: theme.interactive[1],
+                    borderColor: theme.border[2],
+                    color: theme.text[2],
+                  },
+                ]}
+                value={email}
+                onChangeText={setEmail}
+                placeholder="Enter your email"
+                placeholderTextColor={theme.text["alpha-1"]}
+                keyboardType="email-address"
+                autoCapitalize="none"
+                autoCorrect={false}
+                editable={!isLoading}
+              />
+            </View>
+
+            <View style={styles.inputContainer}>
+              <Text style={[styles.label, { color: theme.text[1] }]}>
+                Password
+              </Text>
+              <TextInput
+                style={[
+                  styles.input,
+                  {
+                    backgroundColor: theme.interactive[1],
+                    borderColor: theme.border[2],
+                    color: theme.text[2],
+                  },
+                ]}
+                value={password}
+                onChangeText={setPassword}
+                placeholder="Enter your password"
+                placeholderTextColor={theme.text["alpha-1"]}
+                secureTextEntry
+                autoCapitalize="none"
+                autoCorrect={false}
+                editable={!isLoading}
+              />
+            </View>
+
+            <TouchableOpacity onPress={handleForgotPassword}>
+              <Text style={[styles.forgotPassword, { color: theme.solid[2] }]}>
+                Forgot your password?
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
               style={[
-                styles.input,
-                {
-                  backgroundColor: theme.interactive[1],
-                  borderColor: theme.border[2],
-                  color: theme.text[2],
-                },
+                styles.loginButton,
+                { backgroundColor: theme.solid[2] },
+                isLoading && styles.disabledButton,
               ]}
-              value={email}
-              onChangeText={setEmail}
-              placeholder="Enter your email"
-              placeholderTextColor={theme.text["alpha-1"]}
-              keyboardType="email-address"
-              autoCapitalize="none"
-              autoCorrect={false}
-              editable={!isLoading}
-            />
-          </View>
-
-          <View style={styles.inputContainer}>
-            <Text style={[styles.label, { color: theme.text[1] }]}>
-              Password
-            </Text>
-            <TextInput
-              style={[
-                styles.input,
-                {
-                  backgroundColor: theme.interactive[1],
-                  borderColor: theme.border[2],
-                  color: theme.text[2],
-                },
-              ]}
-              value={password}
-              onChangeText={setPassword}
-              placeholder="Enter your password"
-              placeholderTextColor={theme.text["alpha-1"]}
-              secureTextEntry
-              autoCapitalize="none"
-              autoCorrect={false}
-              editable={!isLoading}
-            />
-          </View>
-
-          <TouchableOpacity onPress={handleForgotPassword}>
-            <Text style={[styles.forgotPassword, { color: theme.solid[2] }]}>
-              Forgot your password?
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[
-              styles.loginButton,
-              { backgroundColor: theme.solid[2] },
-              isLoading && styles.disabledButton,
-            ]}
-            onPress={handleLogin}
-            disabled={isLoading}
-          >
-            <Text
-              style={[styles.loginButtonText, { color: theme.background[1] }]}
+              onPress={handleLogin}
+              disabled={isLoading}
             >
-              {isLoading ? "Signing in..." : "Sign In"}
-            </Text>
-          </TouchableOpacity>
+              <Text
+                style={[styles.loginButtonText, { color: theme.background[1] }]}
+              >
+                {isLoading ? "Signing in..." : "Sign In"}
+              </Text>
+            </TouchableOpacity>
 
-          <View style={styles.footer}>
-            <Text style={[styles.footerText, { color: theme.text[1] }]}>
-              {"Don't have an account?"}
-            </Text>
-            <Link href="/(auth)/register" asChild>
-              <TouchableOpacity>
-                <Text style={[styles.linkText, { color: theme.solid[2] }]}>
-                  Sign up
-                </Text>
-              </TouchableOpacity>
-            </Link>
+            <View style={styles.footer}>
+              <Text style={[styles.footerText, { color: theme.text[1] }]}>
+                {"Don't have an account?"}
+              </Text>
+              <Link href="/(auth)/register" asChild>
+                <TouchableOpacity>
+                  <Text style={[styles.linkText, { color: theme.solid[2] }]}>
+                    Sign up
+                  </Text>
+                </TouchableOpacity>
+              </Link>
+            </View>
           </View>
         </View>
-      </View>
-    </KeyboardAvoidingView>
+      </KeyboardAvoidingView>
+    </LinearGradient>
   );
 }
 
