@@ -74,7 +74,7 @@ export default function TabHeader({
       </View>
       <Ionicons name="search" size={24} color={theme.solid[1]} />
       <TextInput
-        style={styles.searchInput}
+        style={[styles.searchInput, { backgroundColor: theme.background[2] }]}
         placeholder={placeholder}
         placeholderTextColor={theme.text[1]}
         onChangeText={onSearchChange}

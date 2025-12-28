@@ -8,10 +8,8 @@ export default function Interests() {
 
   return (
     <LinearGradient
-      colors={[theme.background[3], theme.background[1]]}
+      colors={[theme.background[4], theme.background[1]]}
       style={styles.container}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 0, y: 1 }}
     >
       <Text>Interests</Text>
     </LinearGradient>

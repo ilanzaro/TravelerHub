@@ -13,7 +13,7 @@ export default function TabsLayout() {
   const theme = radixColors[colorScheme ?? "dark"];
   const pathname = usePathname();
   const isDirectsRoute = pathname === "/directs";
-  const chatboxColor = isDirectsRoute ? theme.solid[2] : theme.solid[1];
+  const chatboxColor = isDirectsRoute ? theme.text[4] : theme.solid[1];
 
   return (
     <Tabs
@@ -23,7 +23,7 @@ export default function TabsLayout() {
         headerTitleStyle: { color: theme.text[4] },
         headerTitleContainerStyle: styles.headerTitleContainer,
         tabBarInactiveTintColor: theme.solid[1],
-        tabBarActiveTintColor: theme.solid[2],
+        tabBarActiveTintColor: theme.text[4],
         tabBarStyle: { backgroundColor: theme.background[4] },
       }}
     >

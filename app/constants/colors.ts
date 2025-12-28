@@ -6,13 +6,13 @@ export const radixColors = {
     background: {
       1: "#ECFEFF",
       2: "#F0F9F9",
-      3: "#E5F7F8",
-      4: "#EAFBFC",
+      3: "#EAFBFC",
+      4: "#E5F7F8",
       5: "#EAFBFC",
       "alpha-1": "#FFE7E336",
       "alpha-2": "#FFE7E336",
-      "alpha-3": "#0D1F2008",
-      "alpha-4": "#6D3F4004",
+      "alpha-3": "#6D3F4004",
+      "alpha-4": "#0D1F2008",
       "alpha-5": "#6D3F4004",
     },
     interactive: {
