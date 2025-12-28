@@ -1,4 +1,4 @@
-import { radixColors } from "@/app/constants/colors";
+import { radixColors } from "@/_constants/colors";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React, { useState } from "react";

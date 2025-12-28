@@ -1,3 +1,4 @@
+import { radixColors } from "@/_constants/colors";
 import {
   Ionicons,
   MaterialCommunityIcons,
@@ -6,7 +7,6 @@ import {
 import { Tabs, usePathname } from "expo-router";
 import { StyleSheet, useColorScheme } from "react-native";
 import TabHeader from "../../components/TabHeader";
-import { radixColors } from "../constants/colors";
 
 export default function TabsLayout() {
   const colorScheme = useColorScheme();

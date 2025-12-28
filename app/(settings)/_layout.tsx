@@ -1,6 +1,6 @@
+import { radixColors } from "@/_constants/colors";
 import { Stack } from "expo-router";
 import { useColorScheme } from "react-native";
-import { radixColors } from "../constants/colors";
 
 export default function SettingsLayout() {
   const colorScheme = useColorScheme();

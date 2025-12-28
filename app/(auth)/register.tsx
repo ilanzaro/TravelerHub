@@ -1,3 +1,4 @@
+import { radixColors } from "@/_constants/colors";
 import { LinearGradient } from "expo-linear-gradient";
 import { Link, router } from "expo-router";
 import React, { useState } from "react";
@@ -13,7 +14,6 @@ import {
   useColorScheme,
   View,
 } from "react-native";
-import { radixColors } from "../constants/colors";
 
 export default function Register() {
   const colorScheme = useColorScheme();

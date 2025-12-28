@@ -1,7 +1,7 @@
+import { radixColors } from "@/_constants/colors";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import { StyleSheet, Text, useColorScheme } from "react-native";
-import { radixColors } from "../constants/colors";
 
 export default function Directs() {
   const colorScheme = useColorScheme();

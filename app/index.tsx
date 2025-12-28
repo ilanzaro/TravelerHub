@@ -1,3 +1,4 @@
+import { radixColors } from "@/_constants/colors";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import {
@@ -8,7 +9,6 @@ import {
   View,
 } from "react-native";
 import LogoSVG from "../assets/svg/travel-hub.svg";
-import { radixColors } from "./constants/colors";
 
 export default function Index() {
   const colorScheme = useColorScheme();
