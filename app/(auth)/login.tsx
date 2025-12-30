@@ -1,7 +1,8 @@
 import { radixColors } from "@/_constants/colors";
 import { LinearGradient } from "expo-linear-gradient";
 import { Link, router } from "expo-router";
-import React, { useState } from "react";
+import React from "react";
+import { Controller, useForm } from "react-hook-form";
 import {
   Alert,
   KeyboardAvoidingView,
@@ -14,27 +15,27 @@ import {
   View,
 } from "react-native";
 
+type LoginFormData = {
+  email: string;
+  password: string;
+};
+
 export default function Login() {
   const colorScheme = useColorScheme();
   const theme = radixColors[colorScheme ?? "dark"];
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
 
-  const handleLogin = async () => {
-    router.replace("/(tabs)/radar");
-    if (!email.trim() || !password.trim()) {
-      Alert.alert("Error", "Please fill in all fields");
-      return;
-    }
+  const {
+    control,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<LoginFormData>({
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
 
-    if (!email.includes("@")) {
-      Alert.alert("Error", "Please enter a valid email address");
-      return;
-    }
-
-    setIsLoading(true);
-
+  const onSubmit = async (data: LoginFormData) => {
     try {
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -42,9 +43,8 @@ export default function Login() {
       // Navigate to main app on success
       router.replace("/(tabs)/radar");
     } catch (error) {
+      console.error("Login error:", error);
       Alert.alert("Error", "Login failed. Please try again.");
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -74,48 +74,90 @@ export default function Login() {
               <Text style={[styles.label, { color: theme.text[1] }]}>
                 Email
               </Text>
-              <TextInput
-                style={[
-                  styles.input,
-                  {
-                    backgroundColor: theme.interactive[1],
-                    borderColor: theme.border[2],
-                    color: theme.text[2],
+              <Controller
+                control={control}
+                name="email"
+                rules={{
+                  required: "Email is required",
+                  pattern: {
+                    value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                    message: "Please enter a valid email address",
                   },
-                ]}
-                value={email}
-                onChangeText={setEmail}
-                placeholder="Enter your email"
-                placeholderTextColor={theme.text["alpha-1"]}
-                keyboardType="email-address"
-                autoCapitalize="none"
-                autoCorrect={false}
-                editable={!isLoading}
+                }}
+                render={({ field: { onChange, onBlur, value } }) => (
+                  <TextInput
+                    style={[
+                      styles.input,
+                      {
+                        backgroundColor: theme.interactive[1],
+                        borderColor: errors.email
+                          ? theme.border[2]
+                          : theme.border[2],
+                        color: theme.text[2],
+                      },
+                    ]}
+                    value={value}
+                    onChangeText={onChange}
+                    onBlur={onBlur}
+                    placeholder="Enter your email"
+                    placeholderTextColor={theme.text["alpha-1"]}
+                    keyboardType="email-address"
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                    editable={!isSubmitting}
+                  />
+                )}
               />
+              {errors.email && (
+                <Text style={[styles.errorText, { color: theme.border[2] }]}>
+                  {errors.email.message}
+                </Text>
+              )}
             </View>
 
             <View style={styles.inputContainer}>
               <Text style={[styles.label, { color: theme.text[1] }]}>
                 Password
               </Text>
-              <TextInput
-                style={[
-                  styles.input,
-                  {
-                    backgroundColor: theme.interactive[1],
-                    borderColor: theme.border[2],
-                    color: theme.text[2],
+              <Controller
+                control={control}
+                name="password"
+                rules={{
+                  required: "Password is required",
+                  minLength: {
+                    value: 6,
+                    message: "Password must be at least 6 characters",
                   },
-                ]}
-                value={password}
-                onChangeText={setPassword}
-                placeholder="Enter your password"
-                placeholderTextColor={theme.text["alpha-1"]}
-                secureTextEntry
-                autoCapitalize="none"
-                autoCorrect={false}
-                editable={!isLoading}
+                }}
+                render={({ field: { onChange, onBlur, value } }) => (
+                  <TextInput
+                    style={[
+                      styles.input,
+                      {
+                        backgroundColor: theme.interactive[1],
+                        borderColor: errors.password
+                          ? theme.border[2]
+                          : theme.border[2],
+                        color: theme.text[2],
+                      },
+                    ]}
+                    value={value}
+                    onChangeText={onChange}
+                    onBlur={onBlur}
+                    placeholder="Enter your password"
+                    placeholderTextColor={theme.text["alpha-1"]}
+                    secureTextEntry
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                    editable={!isSubmitting}
+                  />
+                )}
               />
+              {errors.password && (
+                <Text style={[styles.errorText, { color: theme.border[2] }]}>
+                  {errors.password.message}
+                </Text>
+              )}
             </View>
 
             <TouchableOpacity onPress={handleForgotPassword}>
@@ -128,15 +170,15 @@ export default function Login() {
               style={[
                 styles.loginButton,
                 { backgroundColor: theme.solid[2] },
-                isLoading && styles.disabledButton,
+                isSubmitting && styles.disabledButton,
               ]}
-              onPress={handleLogin}
-              disabled={isLoading}
+              onPress={handleSubmit(onSubmit)}
+              disabled={isSubmitting}
             >
               <Text
                 style={[styles.loginButtonText, { color: theme.background[1] }]}
               >
-                {isLoading ? "Signing in..." : "Sign In"}
+                {isSubmitting ? "Signing in..." : "Sign In"}
               </Text>
             </TouchableOpacity>
 
@@ -231,5 +273,9 @@ const styles = StyleSheet.create({
   linkText: {
     fontSize: 14,
     fontWeight: "500",
+  },
+  errorText: {
+    fontSize: 12,
+    marginTop: 4,
   },
 });
