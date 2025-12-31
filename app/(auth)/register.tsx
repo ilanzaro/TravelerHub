@@ -18,11 +18,11 @@ import {
 export default function Register() {
   const colorScheme = useColorScheme();
   const theme = radixColors[colorScheme ?? "dark"];
+  const [activeTab, setActiveTab] = useState<"email" | "gmail">("email");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [repeatPassword, setRepeatPassword] = useState("");
   const [nickname, setNickname] = useState("");
-  const [dateOfBirth, setDateOfBirth] = useState(new Date());
   const [dateString, setDateString] = useState(
     new Date().toISOString().split("T")[0]
   ); // YYYY-MM-DD format
@@ -43,8 +43,28 @@ export default function Register() {
           onPress: () => router.replace("/(tabs)/radar"),
         },
       ]);
-    } catch (error) {
+    } catch {
       Alert.alert("Error", "Registration failed. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleGmailAuth = async () => {
+    setIsLoading(true);
+
+    try {
+      // Simulate Gmail OAuth call
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+
+      Alert.alert("Success", "Connected with Gmail successfully!", [
+        {
+          text: "OK",
+          onPress: () => router.replace("/(tabs)/radar"),
+        },
+      ]);
+    } catch {
+      Alert.alert("Error", "Gmail authentication failed. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -52,15 +72,6 @@ export default function Register() {
 
   const handleDateChange = (text: string) => {
     setDateString(text);
-    // Convert to Date object if needed
-    const date = new Date(text);
-    if (!isNaN(date.getTime())) {
-      setDateOfBirth(date);
-    }
-  };
-
-  const formatDate = (date: Date) => {
-    return date.toLocaleDateString();
   };
 
   const handleBackToLogin = () => {
@@ -96,7 +107,7 @@ export default function Register() {
             </Text>
           </View>
 
-          {/* Required Information Card */}
+          {/* Authentication Card with Tabs */}
           <View
             style={[
               styles.card,
@@ -106,102 +117,190 @@ export default function Register() {
               },
             ]}
           >
-            <Text style={[styles.cardTitle, { color: theme.text[4] }]}>
-              Required Information *
-            </Text>
+            {/* Tab Selector */}
+            <View
+              style={[
+                styles.tabContainer,
+                { borderBottomColor: theme.border[2] },
+              ]}
+            >
+              <TouchableOpacity
+                style={styles.tab}
+                onPress={() => setActiveTab("email")}
+                disabled={isLoading}
+              >
+                <Text
+                  style={[
+                    styles.tabText,
+                    {
+                      color:
+                        activeTab === "email"
+                          ? theme.text[4]
+                          : theme.text["alpha-1"],
+                    },
+                  ]}
+                >
+                  Email & Password
+                </Text>
+                {activeTab === "email" && (
+                  <View
+                    style={[
+                      styles.tabIndicator,
+                      { backgroundColor: theme.solid[2] },
+                    ]}
+                  />
+                )}
+              </TouchableOpacity>
 
-            <View style={styles.inputContainer}>
-              <Text style={[styles.label, { color: theme.text[1] }]}>
-                Email *
-              </Text>
-              <TextInput
-                style={[
-                  styles.input,
-                  {
-                    backgroundColor: theme.background[1],
-                    borderColor: theme.border[2],
-                    color: theme.text[2],
-                  },
-                ]}
-                value={email}
-                onChangeText={setEmail}
-                placeholder="Enter your email"
-                placeholderTextColor={theme.text["alpha-1"]}
-                keyboardType="email-address"
-                autoCapitalize="none"
-                autoCorrect={false}
-                editable={!isLoading}
-              />
+              <TouchableOpacity
+                style={styles.tab}
+                onPress={() => setActiveTab("gmail")}
+                disabled={isLoading}
+              >
+                <Text
+                  style={[
+                    styles.tabText,
+                    {
+                      color:
+                        activeTab === "gmail"
+                          ? theme.text[4]
+                          : theme.text["alpha-1"],
+                    },
+                  ]}
+                >
+                  Gmail
+                </Text>
+                {activeTab === "gmail" && (
+                  <View
+                    style={[
+                      styles.tabIndicator,
+                      { backgroundColor: theme.solid[2] },
+                    ]}
+                  />
+                )}
+              </TouchableOpacity>
             </View>
 
-            <View style={styles.inputContainer}>
-              <Text style={[styles.label, { color: theme.text[1] }]}>
-                Nickname *
-              </Text>
-              <TextInput
-                style={[
-                  styles.input,
-                  {
-                    backgroundColor: theme.background[1],
-                    borderColor: theme.border[2],
-                    color: theme.text[2],
-                  },
-                ]}
-                value={nickname}
-                onChangeText={setNickname}
-                placeholder="Choose a nickname"
-                placeholderTextColor={theme.text["alpha-1"]}
-                autoCapitalize="none"
-                editable={!isLoading}
-              />
-            </View>
+            {/* Tab Content */}
+            <View style={styles.tabContent}>
+              {activeTab === "email" ? (
+                <>
+                  <View style={styles.inputContainer}>
+                    <Text style={[styles.label, { color: theme.text[1] }]}>
+                      Email *
+                    </Text>
+                    <TextInput
+                      style={[
+                        styles.input,
+                        {
+                          backgroundColor: theme.background[1],
+                          borderColor: theme.border[2],
+                          color: theme.text[2],
+                        },
+                      ]}
+                      value={email}
+                      onChangeText={setEmail}
+                      placeholder="Enter your email"
+                      placeholderTextColor={theme.text["alpha-1"]}
+                      keyboardType="email-address"
+                      autoCapitalize="none"
+                      autoCorrect={false}
+                      editable={!isLoading}
+                    />
+                  </View>
 
-            <View style={styles.inputContainer}>
-              <Text style={[styles.label, { color: theme.text[1] }]}>
-                Password *
-              </Text>
-              <TextInput
-                style={[
-                  styles.input,
-                  {
-                    backgroundColor: theme.background[1],
-                    borderColor: theme.border[2],
-                    color: theme.text[2],
-                  },
-                ]}
-                value={password}
-                onChangeText={setPassword}
-                placeholder="Create a password"
-                placeholderTextColor={theme.text["alpha-1"]}
-                secureTextEntry
-                autoCapitalize="none"
-                autoCorrect={false}
-                editable={!isLoading}
-              />
-            </View>
+                  <View style={styles.inputContainer}>
+                    <Text style={[styles.label, { color: theme.text[1] }]}>
+                      Password *
+                    </Text>
+                    <TextInput
+                      style={[
+                        styles.input,
+                        {
+                          backgroundColor: theme.background[1],
+                          borderColor: theme.border[2],
+                          color: theme.text[2],
+                        },
+                      ]}
+                      value={password}
+                      onChangeText={setPassword}
+                      placeholder="Create a password"
+                      placeholderTextColor={theme.text["alpha-1"]}
+                      secureTextEntry
+                      autoCapitalize="none"
+                      autoCorrect={false}
+                      editable={!isLoading}
+                    />
+                  </View>
 
-            <View style={styles.inputContainer}>
-              <Text style={[styles.label, { color: theme.text[1] }]}>
-                Repeat Password *
-              </Text>
-              <TextInput
-                style={[
-                  styles.input,
-                  {
-                    backgroundColor: theme.background[1],
-                    borderColor: theme.border[2],
-                    color: theme.text[2],
-                  },
-                ]}
-                value={repeatPassword}
-                onChangeText={setRepeatPassword}
-                placeholder="Repeat your password"
-                placeholderTextColor={theme.text["alpha-1"]}
-                secureTextEntry
-                autoCapitalize="none"
-                autoCorrect={false}
-                editable={!isLoading}
-              />
+                  <View style={styles.inputContainer}>
+                    <Text style={[styles.label, { color: theme.text[1] }]}>
+                      Repeat Password *
+                    </Text>
+                    <TextInput
+                      style={[
+                        styles.input,
+                        {
+                          backgroundColor: theme.background[1],
+                          borderColor: theme.border[2],
+                          color: theme.text[2],
+                        },
+                      ]}
+                      value={repeatPassword}
+                      onChangeText={setRepeatPassword}
+                      placeholder="Repeat your password"
+                      placeholderTextColor={theme.text["alpha-1"]}
+                      secureTextEntry
+                      autoCapitalize="none"
+                      autoCorrect={false}
+                      editable={!isLoading}
+                    />
+                  </View>
+                </>
+              ) : (
+                <>
+                  <View style={styles.inputContainer}>
+                    <Text style={[styles.label, { color: theme.text[1] }]}>
+                      Nickname *
+                    </Text>
+                    <TextInput
+                      style={[
+                        styles.input,
+                        {
+                          backgroundColor: theme.background[1],
+                          borderColor: theme.border[2],
+                          color: theme.text[2],
+                        },
+                      ]}
+                      value={nickname}
+                      onChangeText={setNickname}
+                      placeholder="Choose a nickname"
+                      placeholderTextColor={theme.text["alpha-1"]}
+                      autoCapitalize="none"
+                      editable={!isLoading}
+                    />
+                  </View>
+
+                  <TouchableOpacity
+                    style={[
+                      styles.gmailButton,
+                      { backgroundColor: theme.solid[2] },
+                      isLoading && styles.disabledButton,
+                    ]}
+                    onPress={handleGmailAuth}
+                    disabled={isLoading}
+                  >
+                    <Text
+                      style={[
+                        styles.gmailButtonText,
+                        { color: theme.background[1] },
+                      ]}
+                    >
+                      {isLoading ? "Connecting..." : "Connect with Gmail"}
+                    </Text>
+                  </TouchableOpacity>
+                </>
+              )}
             </View>
           </View>
 
@@ -300,24 +399,26 @@ export default function Register() {
             </View>
           </View>
 
-          <TouchableOpacity
-            style={[
-              styles.registerButton,
-              { backgroundColor: theme.solid[2] },
-              isLoading && styles.disabledButton,
-            ]}
-            onPress={handleRegister}
-            disabled={isLoading}
-          >
-            <Text
+          {activeTab === "email" && (
+            <TouchableOpacity
               style={[
-                styles.registerButtonText,
-                { color: theme.background[1] },
+                styles.registerButton,
+                { backgroundColor: theme.solid[2] },
+                isLoading && styles.disabledButton,
               ]}
+              onPress={handleRegister}
+              disabled={isLoading}
             >
-              {isLoading ? "Creating Account..." : "Create Account"}
-            </Text>
-          </TouchableOpacity>
+              <Text
+                style={[
+                  styles.registerButtonText,
+                  { color: theme.background[1] },
+                ]}
+              >
+                {isLoading ? "Creating Account..." : "Create Account"}
+              </Text>
+            </TouchableOpacity>
+          )}
 
           <View style={styles.footer}>
             <Text style={[styles.footerText, { color: theme.text[1] }]}>
@@ -378,6 +479,44 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "600",
     marginBottom: 16,
+  },
+  tabContainer: {
+    flexDirection: "row",
+    marginBottom: 20,
+    marginHorizontal: -20,
+    paddingHorizontal: 20,
+    borderBottomWidth: 1,
+  },
+  tab: {
+    flex: 1,
+    paddingVertical: 12,
+    alignItems: "center",
+    position: "relative",
+  },
+  tabText: {
+    fontSize: 15,
+    fontWeight: "500",
+  },
+  tabIndicator: {
+    position: "absolute",
+    bottom: -1,
+    left: 0,
+    right: 0,
+    height: 2,
+  },
+  tabContent: {
+    marginTop: 4,
+  },
+  gmailButton: {
+    height: 50,
+    borderRadius: 12,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 8,
+  },
+  gmailButtonText: {
+    fontSize: 16,
+    fontWeight: "600",
   },
   inputContainer: {
     marginBottom: 16,

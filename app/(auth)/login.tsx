@@ -79,10 +79,10 @@ export default function Login() {
                 name="email"
                 rules={{
                   required: "Email is required",
-                  pattern: {
+                  /*                   pattern: {
                     value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
                     message: "Please enter a valid email address",
-                  },
+                  }, */
                 }}
                 render={({ field: { onChange, onBlur, value } }) => (
                   <TextInput
@@ -124,10 +124,10 @@ export default function Login() {
                 name="password"
                 rules={{
                   required: "Password is required",
-                  minLength: {
+                  /*                   minLength: {
                     value: 6,
                     message: "Password must be at least 6 characters",
-                  },
+                  }, */
                 }}
                 render={({ field: { onChange, onBlur, value } }) => (
                   <TextInput
