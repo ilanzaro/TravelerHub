@@ -149,7 +149,6 @@ export default function TabsLayout() {
                   color={chatboxColor}
                 />
               }
-              placeholder="Search trails..."
             />
           ),
           tabBarIcon: ({ color, focused }) => (
