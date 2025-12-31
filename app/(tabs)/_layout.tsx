@@ -40,7 +40,6 @@ export default function TabsLayout() {
                   color={chatboxColor}
                 />
               }
-              placeholder="Search destinations..."
             />
           ),
           tabBarIcon: ({ color, focused }) => (
@@ -61,7 +60,6 @@ export default function TabsLayout() {
                   color={chatboxColor}
                 />
               }
-              placeholder="Search travelmates..."
             />
           ),
           tabBarIcon: ({ color, focused }) => (
@@ -86,7 +84,6 @@ export default function TabsLayout() {
                   color={chatboxColor}
                 />
               }
-              placeholder="Search postcards..."
             />
           ),
           tabBarIcon: ({ color, focused }) => (
@@ -108,7 +105,6 @@ export default function TabsLayout() {
                   color={chatboxColor}
                 />
               }
-              placeholder="Search postcards..."
             />
           ),
           tabBarIcon: ({ color, focused }) => (
@@ -129,7 +125,6 @@ export default function TabsLayout() {
                   color={chatboxColor}
                 />
               }
-              placeholder="Search interests..."
             />
           ),
           tabBarIcon: ({ color, focused }) => (

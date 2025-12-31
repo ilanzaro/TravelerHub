@@ -4,7 +4,6 @@ import { router } from "expo-router";
 import React, { useState } from "react";
 import {
   StyleSheet,
-  TextInput,
   TouchableOpacity,
   useColorScheme,
   View,
@@ -12,16 +11,10 @@ import {
 import MenuDropdown, { MenuOption } from "./MenuDropdown";
 
 interface TabHeaderProps {
-  onSearchChange?: (text: string) => void;
-  placeholder?: string;
   navIcon?: React.ReactNode;
 }
 
-export default function TabHeader({
-  onSearchChange,
-  placeholder = "Search...",
-  navIcon,
-}: TabHeaderProps) {
+export default function TabHeader({ navIcon }: TabHeaderProps) {
   const colorScheme = useColorScheme();
   const theme = radixColors[colorScheme ?? "dark"];
   const [showDropdown, setShowDropdown] = useState(false);
@@ -59,7 +52,7 @@ export default function TabHeader({
     <View style={styles.headerContainer}>
       <View style={styles.menuContainer}>
         <TouchableOpacity onPress={handleProfilePress}>
-          <Ionicons name="person-circle" size={24} color={theme.solid[1]} />
+          <Ionicons name="person-circle" size={30} color={theme.solid[1]} />
         </TouchableOpacity>
 
         <MenuDropdown
@@ -68,13 +61,6 @@ export default function TabHeader({
           options={menuOptions}
         />
       </View>
-      <Ionicons name="search" size={24} color={theme.solid[1]} />
-      <TextInput
-        style={[styles.searchInput, { backgroundColor: theme.background[2] }]}
-        placeholder={placeholder}
-        placeholderTextColor={theme.text[1]}
-        onChangeText={onSearchChange}
-      />
       {navIcon && (
         <TouchableOpacity onPress={handleDirectsPress}>
           {navIcon}
@@ -88,6 +74,7 @@ const styles = StyleSheet.create({
   headerContainer: {
     flex: 1,
     flexDirection: "row",
+    justifyContent: "space-between",
     alignItems: "center",
     paddingHorizontal: 12,
     gap: 12,
