@@ -1,4 +1,5 @@
 import { radixColors } from "@/_constants/colors";
+import { SelectedTags, tagCategories } from "@/_constants/tags";
 import { LinearGradient } from "expo-linear-gradient";
 import { Link, router } from "expo-router";
 import React, { useState } from "react";
@@ -29,6 +30,12 @@ export default function Register() {
   const [bio, setBio] = useState("");
   const [location, setLocation] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedTags, setSelectedTags] = useState<SelectedTags>({
+    "travel-style": null,
+    activities: [],
+    lifestyle: [],
+    "urban-leisure": [],
+  });
 
   const handleRegister = async () => {
     setIsLoading(true);
@@ -76,6 +83,38 @@ export default function Register() {
 
   const handleBackToLogin = () => {
     router.back();
+  };
+
+  const handleTagToggle = (
+    category: keyof typeof selectedTags,
+    tag: string
+  ) => {
+    if (category === "travel-style") {
+      // Single selection: toggle or set
+      setSelectedTags((prev) => ({
+        ...prev,
+        [category]: prev[category] === tag ? null : tag,
+      }));
+    } else {
+      // Multi selection: add or remove
+      setSelectedTags((prev) => {
+        const currentTags = prev[category];
+        const isSelected = currentTags.includes(tag);
+        return {
+          ...prev,
+          [category]: isSelected
+            ? currentTags.filter((t) => t !== tag)
+            : [...currentTags, tag],
+        };
+      });
+    }
+  };
+
+  const isTagSelected = (category: keyof typeof selectedTags, tag: string) => {
+    if (category === "travel-style") {
+      return selectedTags[category] === tag;
+    }
+    return selectedTags[category].includes(tag);
   };
 
   return (
@@ -342,6 +381,77 @@ export default function Register() {
             </View>
           </View>
 
+          {/* Interests & Tags Section */}
+          <View
+            style={[
+              styles.card,
+              {
+                backgroundColor: theme.interactive[2],
+                borderColor: theme.border[3],
+              },
+            ]}
+          >
+            <Text style={[styles.cardTitle, { color: theme.text[4] }]}>
+              Interests & Tags (Optional)
+            </Text>
+
+            {Object.entries(tagCategories).map(([categoryKey, category]) => (
+              <View key={categoryKey} style={styles.tagCategoryContainer}>
+                <Text style={[styles.categoryLabel, { color: theme.text[2] }]}>
+                  {category.title}
+                  {!category.multiSelect && " (choose one)"}
+                </Text>
+                <View style={styles.tagsContainer}>
+                  {category.tags.map((tag) => (
+                    <TouchableOpacity
+                      key={tag}
+                      style={[
+                        styles.tag,
+                        {
+                          backgroundColor: isTagSelected(
+                            categoryKey as keyof typeof selectedTags,
+                            tag
+                          )
+                            ? theme.solid[2]
+                            : theme.background[1],
+                          borderColor: isTagSelected(
+                            categoryKey as keyof typeof selectedTags,
+                            tag
+                          )
+                            ? theme.solid[2]
+                            : theme.border[2],
+                        },
+                      ]}
+                      onPress={() =>
+                        handleTagToggle(
+                          categoryKey as keyof typeof selectedTags,
+                          tag
+                        )
+                      }
+                      disabled={isLoading}
+                    >
+                      <Text
+                        style={[
+                          styles.tagText,
+                          {
+                            color: isTagSelected(
+                              categoryKey as keyof typeof selectedTags,
+                              tag
+                            )
+                              ? theme.background[1]
+                              : theme.text[2],
+                          },
+                        ]}
+                      >
+                        {tag}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              </View>
+            ))}
+          </View>
+
           {/* Additional Information Section */}
           <View
             style={[
@@ -517,6 +627,30 @@ const styles = StyleSheet.create({
   gmailButtonText: {
     fontSize: 16,
     fontWeight: "600",
+  },
+  tagCategoryContainer: {
+    marginBottom: 20,
+  },
+  categoryLabel: {
+    fontSize: 15,
+    fontWeight: "500",
+    marginBottom: 10,
+  },
+  tagsContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+  },
+  tag: {
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 20,
+    borderWidth: 1,
+    marginBottom: 4,
+  },
+  tagText: {
+    fontSize: 14,
+    fontWeight: "500",
   },
   inputContainer: {
     marginBottom: 16,
