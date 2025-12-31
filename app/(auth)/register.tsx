@@ -3,6 +3,7 @@ import { SelectedTags, tagCategories } from "@/_constants/tags";
 import { LinearGradient } from "expo-linear-gradient";
 import { Link, router } from "expo-router";
 import React, { useState } from "react";
+import { Controller, useForm } from "react-hook-form";
 import {
   Alert,
   KeyboardAvoidingView,
@@ -16,32 +17,52 @@ import {
   View,
 } from "react-native";
 
+type RegisterFormData = {
+  email: string;
+  password: string;
+  repeatPassword: string;
+  nickname: string;
+  dateOfBirth: string;
+  location: string;
+  bio: string;
+  selectedTags: SelectedTags;
+};
+
 export default function Register() {
   const colorScheme = useColorScheme();
   const theme = radixColors[colorScheme ?? "dark"];
   const [activeTab, setActiveTab] = useState<"email" | "gmail">("email");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [repeatPassword, setRepeatPassword] = useState("");
-  const [nickname, setNickname] = useState("");
-  const [dateString, setDateString] = useState(
-    new Date().toISOString().split("T")[0]
-  ); // YYYY-MM-DD format
-  const [bio, setBio] = useState("");
-  const [location, setLocation] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const [selectedTags, setSelectedTags] = useState<SelectedTags>({
-    "travel-style": null,
-    activities: [],
-    lifestyle: [],
-    "urban-leisure": [],
+
+  const {
+    control,
+    handleSubmit,
+    setValue,
+    watch,
+    formState: { isSubmitting },
+  } = useForm<RegisterFormData>({
+    defaultValues: {
+      email: "",
+      password: "",
+      repeatPassword: "",
+      nickname: "",
+      dateOfBirth: new Date().toISOString().split("T")[0],
+      location: "",
+      bio: "",
+      selectedTags: {
+        "travel-style": null,
+        activities: [],
+        lifestyle: [],
+        "urban-leisure": [],
+      },
+    },
   });
 
-  const handleRegister = async () => {
-    setIsLoading(true);
+  const selectedTags = watch("selectedTags");
 
+  const onSubmit = async (data: RegisterFormData) => {
     try {
-      // Simulate API call
+      // Simulate API call with form data including tags
+      console.log("Registration data:", data);
       await new Promise((resolve) => setTimeout(resolve, 1500));
 
       Alert.alert("Success", "Account created successfully!", [
@@ -52,14 +73,10 @@ export default function Register() {
       ]);
     } catch {
       Alert.alert("Error", "Registration failed. Please try again.");
-    } finally {
-      setIsLoading(false);
     }
   };
 
   const handleGmailAuth = async () => {
-    setIsLoading(true);
-
     try {
       // Simulate Gmail OAuth call
       await new Promise((resolve) => setTimeout(resolve, 1500));
@@ -72,45 +89,42 @@ export default function Register() {
       ]);
     } catch {
       Alert.alert("Error", "Gmail authentication failed. Please try again.");
-    } finally {
-      setIsLoading(false);
     }
-  };
-
-  const handleDateChange = (text: string) => {
-    setDateString(text);
   };
 
   const handleBackToLogin = () => {
     router.back();
   };
 
-  const handleTagToggle = (
-    category: keyof typeof selectedTags,
-    tag: string
-  ) => {
+  const handleTagToggle = (category: keyof SelectedTags, tag: string) => {
     if (category === "travel-style") {
       // Single selection: toggle or set
-      setSelectedTags((prev) => ({
-        ...prev,
-        [category]: prev[category] === tag ? null : tag,
-      }));
+      setValue(
+        "selectedTags",
+        {
+          ...selectedTags,
+          [category]: selectedTags[category] === tag ? null : tag,
+        },
+        { shouldDirty: true }
+      );
     } else {
       // Multi selection: add or remove
-      setSelectedTags((prev) => {
-        const currentTags = prev[category];
-        const isSelected = currentTags.includes(tag);
-        return {
-          ...prev,
+      const currentTags = selectedTags[category];
+      const isSelected = currentTags.includes(tag);
+      setValue(
+        "selectedTags",
+        {
+          ...selectedTags,
           [category]: isSelected
             ? currentTags.filter((t) => t !== tag)
             : [...currentTags, tag],
-        };
-      });
+        },
+        { shouldDirty: true }
+      );
     }
   };
 
-  const isTagSelected = (category: keyof typeof selectedTags, tag: string) => {
+  const isTagSelected = (category: keyof SelectedTags, tag: string) => {
     if (category === "travel-style") {
       return selectedTags[category] === tag;
     }
@@ -166,7 +180,7 @@ export default function Register() {
               <TouchableOpacity
                 style={styles.tab}
                 onPress={() => setActiveTab("email")}
-                disabled={isLoading}
+                disabled={isSubmitting}
               >
                 <Text
                   style={[
@@ -194,7 +208,7 @@ export default function Register() {
               <TouchableOpacity
                 style={styles.tab}
                 onPress={() => setActiveTab("gmail")}
-                disabled={isLoading}
+                disabled={isSubmitting}
               >
                 <Text
                   style={[
@@ -228,23 +242,30 @@ export default function Register() {
                     <Text style={[styles.label, { color: theme.text[1] }]}>
                       Email *
                     </Text>
-                    <TextInput
-                      style={[
-                        styles.input,
-                        {
-                          backgroundColor: theme.background[1],
-                          borderColor: theme.border[2],
-                          color: theme.text[2],
-                        },
-                      ]}
-                      value={email}
-                      onChangeText={setEmail}
-                      placeholder="Enter your email"
-                      placeholderTextColor={theme.text["alpha-1"]}
-                      keyboardType="email-address"
-                      autoCapitalize="none"
-                      autoCorrect={false}
-                      editable={!isLoading}
+                    <Controller
+                      control={control}
+                      name="email"
+                      render={({ field: { onChange, onBlur, value } }) => (
+                        <TextInput
+                          style={[
+                            styles.input,
+                            {
+                              backgroundColor: theme.background[1],
+                              borderColor: theme.border[2],
+                              color: theme.text[2],
+                            },
+                          ]}
+                          value={value}
+                          onChangeText={onChange}
+                          onBlur={onBlur}
+                          placeholder="Enter your email"
+                          placeholderTextColor={theme.text["alpha-1"]}
+                          keyboardType="email-address"
+                          autoCapitalize="none"
+                          autoCorrect={false}
+                          editable={!isSubmitting}
+                        />
+                      )}
                     />
                   </View>
 
@@ -252,23 +273,30 @@ export default function Register() {
                     <Text style={[styles.label, { color: theme.text[1] }]}>
                       Password *
                     </Text>
-                    <TextInput
-                      style={[
-                        styles.input,
-                        {
-                          backgroundColor: theme.background[1],
-                          borderColor: theme.border[2],
-                          color: theme.text[2],
-                        },
-                      ]}
-                      value={password}
-                      onChangeText={setPassword}
-                      placeholder="Create a password"
-                      placeholderTextColor={theme.text["alpha-1"]}
-                      secureTextEntry
-                      autoCapitalize="none"
-                      autoCorrect={false}
-                      editable={!isLoading}
+                    <Controller
+                      control={control}
+                      name="password"
+                      render={({ field: { onChange, onBlur, value } }) => (
+                        <TextInput
+                          style={[
+                            styles.input,
+                            {
+                              backgroundColor: theme.background[1],
+                              borderColor: theme.border[2],
+                              color: theme.text[2],
+                            },
+                          ]}
+                          value={value}
+                          onChangeText={onChange}
+                          onBlur={onBlur}
+                          placeholder="Create a password"
+                          placeholderTextColor={theme.text["alpha-1"]}
+                          secureTextEntry
+                          autoCapitalize="none"
+                          autoCorrect={false}
+                          editable={!isSubmitting}
+                        />
+                      )}
                     />
                   </View>
 
@@ -276,23 +304,30 @@ export default function Register() {
                     <Text style={[styles.label, { color: theme.text[1] }]}>
                       Repeat Password *
                     </Text>
-                    <TextInput
-                      style={[
-                        styles.input,
-                        {
-                          backgroundColor: theme.background[1],
-                          borderColor: theme.border[2],
-                          color: theme.text[2],
-                        },
-                      ]}
-                      value={repeatPassword}
-                      onChangeText={setRepeatPassword}
-                      placeholder="Repeat your password"
-                      placeholderTextColor={theme.text["alpha-1"]}
-                      secureTextEntry
-                      autoCapitalize="none"
-                      autoCorrect={false}
-                      editable={!isLoading}
+                    <Controller
+                      control={control}
+                      name="repeatPassword"
+                      render={({ field: { onChange, onBlur, value } }) => (
+                        <TextInput
+                          style={[
+                            styles.input,
+                            {
+                              backgroundColor: theme.background[1],
+                              borderColor: theme.border[2],
+                              color: theme.text[2],
+                            },
+                          ]}
+                          value={value}
+                          onChangeText={onChange}
+                          onBlur={onBlur}
+                          placeholder="Repeat your password"
+                          placeholderTextColor={theme.text["alpha-1"]}
+                          secureTextEntry
+                          autoCapitalize="none"
+                          autoCorrect={false}
+                          editable={!isSubmitting}
+                        />
+                      )}
                     />
                   </View>
                 </>
@@ -302,21 +337,28 @@ export default function Register() {
                     <Text style={[styles.label, { color: theme.text[1] }]}>
                       Nickname *
                     </Text>
-                    <TextInput
-                      style={[
-                        styles.input,
-                        {
-                          backgroundColor: theme.background[1],
-                          borderColor: theme.border[2],
-                          color: theme.text[2],
-                        },
-                      ]}
-                      value={nickname}
-                      onChangeText={setNickname}
-                      placeholder="Choose a nickname"
-                      placeholderTextColor={theme.text["alpha-1"]}
-                      autoCapitalize="none"
-                      editable={!isLoading}
+                    <Controller
+                      control={control}
+                      name="nickname"
+                      render={({ field: { onChange, onBlur, value } }) => (
+                        <TextInput
+                          style={[
+                            styles.input,
+                            {
+                              backgroundColor: theme.background[1],
+                              borderColor: theme.border[2],
+                              color: theme.text[2],
+                            },
+                          ]}
+                          value={value}
+                          onChangeText={onChange}
+                          onBlur={onBlur}
+                          placeholder="Choose a nickname"
+                          placeholderTextColor={theme.text["alpha-1"]}
+                          autoCapitalize="none"
+                          editable={!isSubmitting}
+                        />
+                      )}
                     />
                   </View>
 
@@ -324,10 +366,10 @@ export default function Register() {
                     style={[
                       styles.gmailButton,
                       { backgroundColor: theme.solid[2] },
-                      isLoading && styles.disabledButton,
+                      isSubmitting && styles.disabledButton,
                     ]}
                     onPress={handleGmailAuth}
-                    disabled={isLoading}
+                    disabled={isSubmitting}
                   >
                     <Text
                       style={[
@@ -335,7 +377,7 @@ export default function Register() {
                         { color: theme.background[1] },
                       ]}
                     >
-                      {isLoading ? "Connecting..." : "Connect with Gmail"}
+                      {isSubmitting ? "Connecting..." : "Connect with Gmail"}
                     </Text>
                   </TouchableOpacity>
                 </>
@@ -361,22 +403,29 @@ export default function Register() {
               <Text style={[styles.label, { color: theme.text[1] }]}>
                 Birthday
               </Text>
-              <TextInput
-                style={[
-                  styles.input,
-                  {
-                    backgroundColor: theme.background[1],
-                    borderColor: theme.border[2],
-                    color: theme.text[2],
-                  },
-                ]}
-                value={dateString}
-                onChangeText={handleDateChange}
-                placeholder="YYYY-MM-DD"
-                placeholderTextColor={theme.text["alpha-1"]}
-                keyboardType="numeric"
-                maxLength={10}
-                editable={!isLoading}
+              <Controller
+                control={control}
+                name="dateOfBirth"
+                render={({ field: { onChange, onBlur, value } }) => (
+                  <TextInput
+                    style={[
+                      styles.input,
+                      {
+                        backgroundColor: theme.background[1],
+                        borderColor: theme.border[2],
+                        color: theme.text[2],
+                      },
+                    ]}
+                    value={value}
+                    onChangeText={onChange}
+                    onBlur={onBlur}
+                    placeholder="YYYY-MM-DD"
+                    placeholderTextColor={theme.text["alpha-1"]}
+                    keyboardType="numeric"
+                    maxLength={10}
+                    editable={!isSubmitting}
+                  />
+                )}
               />
             </View>
           </View>
@@ -428,7 +477,7 @@ export default function Register() {
                           tag
                         )
                       }
-                      disabled={isLoading}
+                      disabled={isSubmitting}
                     >
                       <Text
                         style={[
@@ -470,41 +519,55 @@ export default function Register() {
               <Text style={[styles.label, { color: theme.text[1] }]}>
                 Location
               </Text>
-              <TextInput
-                style={[
-                  styles.input,
-                  {
-                    backgroundColor: theme.background[1],
-                    borderColor: theme.border[2],
-                    color: theme.text[2],
-                  },
-                ]}
-                value={location}
-                onChangeText={setLocation}
-                placeholder="Where are you from?"
-                placeholderTextColor={theme.text["alpha-1"]}
-                editable={!isLoading}
+              <Controller
+                control={control}
+                name="location"
+                render={({ field: { onChange, onBlur, value } }) => (
+                  <TextInput
+                    style={[
+                      styles.input,
+                      {
+                        backgroundColor: theme.background[1],
+                        borderColor: theme.border[2],
+                        color: theme.text[2],
+                      },
+                    ]}
+                    value={value}
+                    onChangeText={onChange}
+                    onBlur={onBlur}
+                    placeholder="Where are you from?"
+                    placeholderTextColor={theme.text["alpha-1"]}
+                    editable={!isSubmitting}
+                  />
+                )}
               />
             </View>
 
             <View style={styles.inputContainer}>
               <Text style={[styles.label, { color: theme.text[1] }]}>Bio</Text>
-              <TextInput
-                style={[
-                  styles.textArea,
-                  {
-                    backgroundColor: theme.background[1],
-                    borderColor: theme.border[2],
-                    color: theme.text[2],
-                  },
-                ]}
-                value={bio}
-                onChangeText={setBio}
-                placeholder="Tell us about yourself..."
-                placeholderTextColor={theme.text["alpha-1"]}
-                multiline
-                numberOfLines={3}
-                editable={!isLoading}
+              <Controller
+                control={control}
+                name="bio"
+                render={({ field: { onChange, onBlur, value } }) => (
+                  <TextInput
+                    style={[
+                      styles.textArea,
+                      {
+                        backgroundColor: theme.background[1],
+                        borderColor: theme.border[2],
+                        color: theme.text[2],
+                      },
+                    ]}
+                    value={value}
+                    onChangeText={onChange}
+                    onBlur={onBlur}
+                    placeholder="Tell us about yourself..."
+                    placeholderTextColor={theme.text["alpha-1"]}
+                    multiline
+                    numberOfLines={3}
+                    editable={!isSubmitting}
+                  />
+                )}
               />
             </View>
           </View>
@@ -514,10 +577,10 @@ export default function Register() {
               style={[
                 styles.registerButton,
                 { backgroundColor: theme.solid[2] },
-                isLoading && styles.disabledButton,
+                isSubmitting && styles.disabledButton,
               ]}
-              onPress={handleRegister}
-              disabled={isLoading}
+              onPress={handleSubmit(onSubmit)}
+              disabled={isSubmitting}
             >
               <Text
                 style={[
@@ -525,7 +588,7 @@ export default function Register() {
                   { color: theme.background[1] },
                 ]}
               >
-                {isLoading ? "Creating Account..." : "Create Account"}
+                {isSubmitting ? "Creating Account..." : "Create Account"}
               </Text>
             </TouchableOpacity>
           )}

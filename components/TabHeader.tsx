@@ -53,9 +53,7 @@ export default function TabHeader({
       id: "logout",
       label: "Logout",
       icon: "log-out",
-      onPress: () => {
-        // Add logout logic
-      },
+      onPress: () => router.push("/(auth)/login"),
     },
   ];
 
