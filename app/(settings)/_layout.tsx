@@ -18,6 +18,10 @@ export default function SettingsLayout() {
         name="profile-edit"
         options={{ title: "Profile Edit", headerTitle: "TravelerHub" }}
       />
+      <Stack.Screen
+        name="user-preferences"
+        options={{ title: "User Preferences", headerTitle: "TravelerHub" }}
+      />
     </Stack>
   );
 }

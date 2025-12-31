@@ -42,12 +42,10 @@ export default function TabHeader({
       onPress: () => router.push("/(settings)/profile-edit"),
     },
     {
-      id: "settings",
-      label: "Settings",
+      id: "preferences",
+      label: "Preferences",
       icon: "settings",
-      onPress: () => {
-        // Add settings navigation
-      },
+      onPress: () => router.push("/(settings)/user-preferences"),
     },
     {
       id: "logout",
