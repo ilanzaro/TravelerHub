@@ -1,6 +1,6 @@
 -- PROFILES
 CREATE TABLE profiles (
-    id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+    id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE, -- link to auth.users
 
     email TEXT UNIQUE NOT NULL,
     name TEXT,
@@ -11,18 +11,24 @@ CREATE TABLE profiles (
     last_online TIMESTAMPTZ,
 
     -- Settings
-    settings_show_age BOOLEAN DEFAULT true,
-    settings_theme TEXT DEFAULT 'auto',        -- light | dark | auto
-    settings_show_distance BOOLEAN DEFAULT true,
+    settings_show_age BOOLEAN DEFAULT true,         -- if false, birth_date will not be exposed publicly
+    settings_theme TEXT DEFAULT 'auto',             -- light | dark | auto
+    settings_show_distance BOOLEAN DEFAULT true,    -- if false, last_location will not be exposed publicly
 
     -- Auth metadata
-    provider TEXT DEFAULT 'email',             -- email | google
+    provider TEXT DEFAULT 'email',            -- email | google
     email_verified BOOLEAN DEFAULT false,
 
     -- Tags
-    tags JSONB DEFAULT '{}'::jsonb,
+    tags JSONB DEFAULT '{}'::jsonb,           -- user interests / travel style etc.
 
-    country CHAR(2),
+    country CHAR(2),                           -- ISO 3166-1 alpha-2 code
+
+    -- Birthday
+    birth_date DATE,                           -- private by default, only exposed if settings_show_age = true
+
+    -- Bio
+    bio TEXT,                                  -- public field; can be empty, optional
 
     -- Soft delete
     deleted_at TIMESTAMPTZ,
@@ -35,10 +41,7 @@ CREATE TABLE profiles (
         CHECK (settings_theme IN ('light', 'dark', 'auto')),
 
     CONSTRAINT check_travel_style_exists
-        CHECK (
-            tags ? 'travel-style'
-            AND jsonb_typeof(tags->'travel-style') = 'string'
-        ),
+        CHECK (tags ? 'travel-style' AND jsonb_typeof(tags->'travel-style') = 'string'),
 
     CONSTRAINT check_country_iso
         CHECK (country IN (
@@ -60,34 +63,69 @@ CREATE TABLE profiles (
         ))
 );
 
+-- =========================
+-- Enable Row-Level Security
+-- =========================
 ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
 
--- Authenticated users can read profiles
-CREATE POLICY "read profiles"
+-- =========================
+-- PRIVATE ACCESS POLICIES
+-- User can see and update their own profile
+-- =========================
+CREATE POLICY "private access select"
   ON profiles
   FOR SELECT
-  USING (auth.uid() IS NOT NULL AND deleted_at IS NULL);
+  USING (auth.uid() = id);
 
--- Users manage their own profile
-CREATE POLICY "insert own profile"
-  ON profiles
-  FOR INSERT
-  WITH CHECK (auth.uid() = id);
-
-CREATE POLICY "update own profile"
+CREATE POLICY "private access update"
   ON profiles
   FOR UPDATE
   USING (auth.uid() = id)
   WITH CHECK (auth.uid() = id);
 
+-- =========================
+-- PUBLIC ACCESS POLICY
+-- Other authenticated users can see only public fields
+-- =========================
+CREATE POLICY "public access"
+  ON profiles
+  FOR SELECT
+  USING (auth.uid() IS NOT NULL AND deleted_at IS NULL);
+
+-- =========================
+-- Public profile view
+-- Only available to authenticated users
+-- Respects settings_show_age and settings_show_distance
+-- =========================
+CREATE OR REPLACE VIEW public.profiles_public
+WITH (security_invoker = true) AS
+SELECT
+    id,
+    name,
+    avatar_urls,
+    tags,
+    country,
+    last_online,
+    bio,
+    CASE WHEN settings_show_distance THEN last_location ELSE NULL END AS last_location,
+    CASE WHEN settings_show_age THEN birth_date ELSE NULL END AS birth_date
+FROM profiles
+WHERE deleted_at IS NULL;
+
+-- Revoke access from unauthenticated users
+REVOKE ALL ON public.profiles_public FROM public;
+-- Grant access only to authenticated users (Supabase role)
+GRANT SELECT ON public.profiles_public TO anon;
+
+-- =========================
 -- Indexes
-CREATE INDEX idx_profiles_location
-  ON profiles USING GIST (last_location);
+-- =========================
+CREATE INDEX idx_profiles_location ON profiles USING GIST(last_location);
+CREATE INDEX idx_profiles_tags ON profiles USING GIN(tags);
 
-CREATE INDEX idx_profiles_tags
-  ON profiles USING GIN (tags);
-
--- Auto-create profile on new auth user
+-- =========================
+-- Auto-create profile on signup
+-- =========================
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS trigger
 LANGUAGE plpgsql
@@ -96,7 +134,6 @@ AS $$
 BEGIN
   INSERT INTO public.profiles (id, email)
   VALUES (NEW.id, NEW.email);
-
   RETURN NEW;
 END;
 $$;
