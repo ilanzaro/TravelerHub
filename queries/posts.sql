@@ -1,38 +1,50 @@
+-- POSTS (postcard | travelmate)
 CREATE TABLE posts (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
-    type TEXT NOT NULL,           -- 'postcard' | 'travelmate'
-    description TEXT,
-    photo_url TEXT,               -- optional
-    location GEOGRAPHY(Point, 4326),
-    tags JSONB,
-    created_at TIMESTAMPTZ DEFAULT now(),
-    expires_at TIMESTAMPTZ DEFAULT (now() + INTERVAL '48 hours'),
 
-    CONSTRAINT check_post_type
-      CHECK (type IN ('postcard', 'travelmate'))
+    type TEXT NOT NULL CHECK (type IN ('postcard', 'travelmate')),
+    description TEXT,
+    photo_url TEXT,
+
+    location GEOGRAPHY(Point, 4326),
+
+    tags JSONB,
+
+    created_at TIMESTAMPTZ DEFAULT now(),
+    expires_at TIMESTAMPTZ DEFAULT (now() + INTERVAL '48 hours')
 );
 
 ALTER TABLE posts ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Users can read posts"
+-- Read (only non-expired)
+CREATE POLICY "read active posts"
   ON posts
   FOR SELECT
-  USING (true);
+  USING (expires_at > now());
 
-CREATE POLICY "Owner can insert posts"
+-- Insert
+CREATE POLICY "insert own post"
   ON posts
   FOR INSERT
   WITH CHECK (auth.uid() = user_id);
 
-CREATE POLICY "Owner can update posts"
+-- Update
+CREATE POLICY "update own post"
   ON posts
   FOR UPDATE
   USING (auth.uid() = user_id)
   WITH CHECK (auth.uid() = user_id);
 
-CREATE POLICY "Owner can delete posts"
+-- Delete
+CREATE POLICY "delete own post"
   ON posts
   FOR DELETE
   USING (auth.uid() = user_id);
 
+-- Indexes
+CREATE INDEX idx_posts_location
+  ON posts USING GIST (location);
+
+CREATE INDEX idx_posts_expires
+  ON posts (expires_at);

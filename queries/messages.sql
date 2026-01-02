@@ -1,31 +1,33 @@
+-- MESSAGES
 CREATE TABLE messages (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    from_user_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
-    to_user_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
-    text TEXT NOT NULL,
-    read BOOLEAN DEFAULT FALSE,
-    created_at TIMESTAMPTZ DEFAULT now(),
-    edited_at TIMESTAMPTZ,
-    deleted_at TIMESTAMPTZ
+
+    sender_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
+    receiver_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
+
+    content TEXT NOT NULL,
+    read_at TIMESTAMPTZ,
+
+    created_at TIMESTAMPTZ DEFAULT now()
 );
 
 ALTER TABLE messages ENABLE ROW LEVEL SECURITY;
 
--- Only sender or recipient can read
-CREATE POLICY "Users can view own messages"
+-- Sender or receiver can read
+CREATE POLICY "participants read messages"
   ON messages
   FOR SELECT
-  USING (auth.uid() = from_user_id OR auth.uid() = to_user_id);
+  USING (
+    auth.uid() = sender_id
+    OR auth.uid() = receiver_id
+  );
 
--- Only sender can insert
-CREATE POLICY "Users can send messages"
+-- Sender inserts
+CREATE POLICY "sender inserts message"
   ON messages
   FOR INSERT
-  WITH CHECK (auth.uid() = from_user_id);
+  WITH CHECK (auth.uid() = sender_id);
 
--- Only recipient can mark as read
-CREATE POLICY "Users can update read status"
-  ON messages
-  FOR UPDATE
-  USING (auth.uid() = to_user_id)
-  WITH CHECK (auth.uid() = to_user_id);
+-- Indexes
+CREATE INDEX idx_messages_sender_receiver
+  ON messages (sender_id, receiver_id, created_at);

@@ -1,20 +1,19 @@
+-- PROFILE INTERESTS (favorites / saved users)
 CREATE TABLE profile_interests (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     profile_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
-    favorite_user_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
-    created_at TIMESTAMPTZ DEFAULT now()
+    target_profile_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
+
+    created_at TIMESTAMPTZ DEFAULT now(),
+
+    PRIMARY KEY (profile_id, target_profile_id),
+    CONSTRAINT no_self_interest CHECK (profile_id <> target_profile_id)
 );
 
 ALTER TABLE profile_interests ENABLE ROW LEVEL SECURITY;
 
--- Only owner can view
-CREATE POLICY "Owner can view interests"
+-- User manages own interests
+CREATE POLICY "manage own interests"
   ON profile_interests
-  FOR SELECT
-  USING (auth.uid() = profile_id);
-
--- Only owner can insert
-CREATE POLICY "Owner can add interest"
-  ON profile_interests
-  FOR INSERT
+  FOR ALL
+  USING (auth.uid() = profile_id)
   WITH CHECK (auth.uid() = profile_id);
