@@ -17,8 +17,8 @@ ALTER TABLE profile_interests ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "manage own interests"
   ON profile_interests
   FOR ALL
-  USING ((select auth.uid()) = profile_id)
-  WITH CHECK ((select auth.uid()) = profile_id);
+  USING ((SELECT auth.uid()) = profile_id)
+  WITH CHECK ((SELECT auth.uid()) = profile_id);
 
 -- =========================
 -- Indexes
