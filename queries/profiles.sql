@@ -1,4 +1,6 @@
--- PROFILES
+-- =========================
+-- PROFILES TABLE
+-- =========================
 CREATE TABLE profiles (
     id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE, -- link to auth.users
 
@@ -122,6 +124,30 @@ GRANT SELECT ON public.profiles_public TO anon;
 -- =========================
 CREATE INDEX idx_profiles_location ON profiles USING GIST(last_location);
 CREATE INDEX idx_profiles_tags ON profiles USING GIN(tags);
+
+-- =========================
+-- Nearby profiles function
+-- Returns profiles within a radius (meters) of a point
+-- =========================
+CREATE OR REPLACE FUNCTION public.nearby_profiles(
+  user_lng DOUBLE PRECISION,
+  user_lat DOUBLE PRECISION,
+  radius_meters INTEGER
+)
+RETURNS SETOF public.profiles_public
+LANGUAGE sql
+SECURITY INVOKER
+AS $$
+  SELECT *
+  FROM public.profiles_public
+  WHERE
+    last_location IS NOT NULL
+    AND ST_DWithin(
+      last_location,
+      ST_MakePoint(user_lng, user_lat)::geography,
+      radius_meters
+    );
+$$;
 
 -- =========================
 -- Auto-create profile on signup
