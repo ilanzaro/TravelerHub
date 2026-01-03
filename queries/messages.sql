@@ -85,9 +85,11 @@ CREATE OR REPLACE FUNCTION public.update_conversation_last_message()
 RETURNS trigger
 LANGUAGE plpgsql
 SECURITY DEFINER
+SET search_path = public, pg_temp
 AS $$
 BEGIN
-  UPDATE conversations
+  -- Fully-qualified table name for safety
+  UPDATE public.conversations
   SET
     last_message_id = NEW.id,
     last_message_at = NEW.created_at
