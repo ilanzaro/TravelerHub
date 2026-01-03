@@ -71,28 +71,27 @@ CREATE TABLE profiles (
 ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
 
 -- =========================
--- PRIVATE ACCESS POLICIES
--- User can see and update their own profile
+-- ACCESS POLICIES
 -- =========================
-CREATE POLICY "private access select"
+
+-- Unified SELECT policy (own profile + other authenticated users)
+CREATE POLICY "profiles select"
   ON profiles
   FOR SELECT
-  USING ((select auth.uid()) = id);
+  USING (
+    deleted_at IS NULL
+    AND (
+      id = (select auth.uid())           -- own profile
+      OR (select auth.uid()) IS NOT NULL -- other authenticated users
+    )
+  );
 
+-- User can update only their own profile
 CREATE POLICY "private access update"
   ON profiles
   FOR UPDATE
   USING ((select auth.uid()) = id)
   WITH CHECK ((select auth.uid()) = id);
-
--- =========================
--- PUBLIC ACCESS POLICY
--- Other authenticated users can see only public fields
--- =========================
-CREATE POLICY "public access"
-  ON profiles
-  FOR SELECT
-  USING ((SELECT auth.uid()) IS NOT NULL AND deleted_at IS NULL);
 
 -- =========================
 -- Public profile view
