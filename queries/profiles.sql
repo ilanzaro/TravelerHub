@@ -77,13 +77,13 @@ ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "private access select"
   ON profiles
   FOR SELECT
-  USING (auth.uid() = id);
+  USING ((select auth.uid()) = id);
 
 CREATE POLICY "private access update"
   ON profiles
   FOR UPDATE
-  USING (auth.uid() = id)
-  WITH CHECK (auth.uid() = id);
+  USING ((select auth.uid()) = id)
+  WITH CHECK ((select auth.uid()) = id);
 
 -- =========================
 -- PUBLIC ACCESS POLICY
@@ -92,7 +92,7 @@ CREATE POLICY "private access update"
 CREATE POLICY "public access"
   ON profiles
   FOR SELECT
-  USING (auth.uid() IS NOT NULL AND deleted_at IS NULL);
+  USING ((SELECT auth.uid()) IS NOT NULL AND deleted_at IS NULL);
 
 -- =========================
 -- Public profile view
@@ -137,6 +137,7 @@ CREATE OR REPLACE FUNCTION public.nearby_profiles(
 RETURNS SETOF public.profiles_public
 LANGUAGE sql
 SECURITY INVOKER
+SET search_path = public, extensions
 AS $$
   SELECT *
   FROM public.profiles_public
@@ -156,6 +157,7 @@ CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS trigger
 LANGUAGE plpgsql
 SECURITY DEFINER
+SET search_path = public, extensions
 AS $$
 BEGIN
   INSERT INTO public.profiles (id, email)

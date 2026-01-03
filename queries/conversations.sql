@@ -15,14 +15,14 @@ CREATE TABLE conversations (
 
   -- =========================
   -- Prevent self-chat
-  -- =========================
+    -- =========================
   CONSTRAINT check_not_self_conversation
     CHECK (user_a <> user_b),
 
   -- =========================
   -- Order-independent uniqueness
   -- Use generated columns so PostgreSQL UNIQUE works
-  -- =========================
+    -- =========================
   user_low  UUID GENERATED ALWAYS AS (LEAST(user_a, user_b)) STORED,
   user_high UUID GENERATED ALWAYS AS (GREATEST(user_a, user_b)) STORED,
   CONSTRAINT unique_conversation_pair UNIQUE (user_low, user_high)
@@ -36,66 +36,92 @@ ALTER TABLE conversations ENABLE ROW LEVEL SECURITY;
 -- =========================
 -- RLS POLICIES
 -- =========================
-
--- Participants can read their conversations
--- Participants can create conversations only if one participant is themselves
--- Participants can update (last_message fields) only if participant
--- =========================
+DROP POLICY IF EXISTS "participants read conversations" ON conversations;
 CREATE POLICY "participants read conversations"
   ON conversations
   FOR SELECT
   USING (
-    auth.uid() = user_a
-    OR auth.uid() = user_b
+    (select auth.uid()) = user_a
+    OR (select auth.uid()) = user_b
   );
 
--- Participants can create a conversation
+DROP POLICY IF EXISTS "participants create conversation" ON conversations;
 CREATE POLICY "participants create conversation"
   ON conversations
   FOR INSERT
   WITH CHECK (
-    auth.uid() = user_a
-    OR auth.uid() = user_b
+    (select auth.uid()) = user_a
+    OR (select auth.uid()) = user_b
   );
 
--- Participants can update (used internally for last_message*)
+DROP POLICY IF EXISTS "participants update conversation" ON conversations;
 CREATE POLICY "participants update conversation"
   ON conversations
   FOR UPDATE
   USING (
-    auth.uid() = user_a
-    OR auth.uid() = user_b
+    (select auth.uid()) = user_a
+    OR (select auth.uid()) = user_b
+  )
+  WITH CHECK (
+    (select auth.uid()) = user_a
+    OR (select auth.uid()) = user_b
   );
 
 -- =========================
 -- INDEXES
 -- =========================
--- Fast retrieval for inbox ordering
-CREATE INDEX idx_conversations_last_message
+CREATE INDEX IF NOT EXISTS idx_conversations_last_message
   ON conversations (last_message_at DESC);
 
--- Fast lookup by user
-CREATE INDEX idx_conversations_user_a
+CREATE INDEX IF NOT EXISTS idx_conversations_user_a
   ON conversations (user_a);
 
-CREATE INDEX idx_conversations_user_b
+CREATE INDEX IF NOT EXISTS idx_conversations_user_b
   ON conversations (user_b);
+
+CREATE INDEX IF NOT EXISTS idx_conversations_user_low ON conversations (user_low);
+CREATE INDEX IF NOT EXISTS idx_conversations_user_high ON conversations (user_high);
 
 -- =========================
 -- VIEW: conversations for current user
 -- =========================
--- Returns the conversation id and the other user id for the current user
--- Only includes conversations where current user is participant
--- =========================
-CREATE VIEW public.my_conversations AS
+CREATE OR REPLACE VIEW public.my_conversations
+WITH (security_invoker = true) AS
 SELECT
   c.id,
   CASE
-    WHEN c.user_a = auth.uid() THEN c.user_b
+    WHEN c.user_a = (select auth.uid()) THEN c.user_b
     ELSE c.user_a
   END AS other_user_id,
   c.last_message_id,
   c.last_message_at,
   c.created_at
 FROM conversations c
-WHERE auth.uid() IN (c.user_a, c.user_b);
+WHERE (select auth.uid()) IN (c.user_a, c.user_b);
+
+CREATE OR REPLACE FUNCTION public.update_conversation_last_message(
+  p_conversation_id uuid,
+  p_last_message_id uuid,
+  p_last_message_at timestamptz
+)
+RETURNS void
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public, pg_temp
+AS $$
+BEGIN
+  UPDATE public.conversations
+  SET
+    last_message_id = p_last_message_id,
+    last_message_at = p_last_message_at
+  WHERE id = p_conversation_id;
+
+  IF NOT FOUND THEN
+    RAISE EXCEPTION 'conversation % not found', p_conversation_id;
+  END IF;
+END;
+$$;
+
+-- Correct privileges
+REVOKE EXECUTE ON FUNCTION public.update_conversation_last_message(uuid, uuid, text, timestamptz) FROM anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.update_conversation_last_message(uuid, uuid, text, timestamptz) TO authenticated;
