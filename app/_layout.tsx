@@ -1,12 +1,18 @@
 import { radixColors } from "@/_constants/colors";
+//import { initAuthListener } from "@/lib/auth/auth-init";
 import { useAuthStore } from "@/stores/authStore";
 import { Stack } from "expo-router";
+//import { useEffect } from "react";
 import { useColorScheme } from "react-native";
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
   const theme = radixColors[colorScheme ?? "dark"];
   const { session, initialized } = useAuthStore();
+
+  /*   useEffect(() => {
+    initAuthListener();
+  }, []); */
 
   console.log("session", session);
   if (!initialized) return null;

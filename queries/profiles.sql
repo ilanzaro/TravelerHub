@@ -142,10 +142,16 @@ AS $$
   FROM public.profiles_public
   WHERE
     last_location IS NOT NULL
+    AND last_online >= now() - INTERVAL '2 hours'
     AND ST_DWithin(
       last_location,
       ST_MakePoint(user_lng, user_lat)::geography,
       radius_meters
+    )
+  ORDER BY
+    ST_Distance(
+      last_location,
+      ST_MakePoint(user_lng, user_lat)::geography
     );
 $$;
 
