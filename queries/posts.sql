@@ -27,20 +27,20 @@ CREATE POLICY "read active posts"
 CREATE POLICY "insert own post"
   ON posts
   FOR INSERT
-  WITH CHECK (auth.uid() = user_id);
+  WITH CHECK ((SELECT auth.uid())= user_id);
 
 -- Update
 CREATE POLICY "update own post"
   ON posts
   FOR UPDATE
-  USING (auth.uid() = user_id)
-  WITH CHECK (auth.uid() = user_id);
+  USING ((SELECT auth.uid()) = user_id)
+  WITH CHECK ((SELECT auth.uid()) = user_id);
 
 -- Delete
 CREATE POLICY "delete own post"
   ON posts
   FOR DELETE
-  USING (auth.uid() = user_id);
+  USING ((SELECT auth.uid()) = user_id);
 
 -- Indexes
 CREATE INDEX idx_posts_location
