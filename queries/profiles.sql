@@ -116,7 +116,7 @@ WHERE deleted_at IS NULL;
 -- Revoke access from unauthenticated users
 REVOKE ALL ON public.profiles_public FROM public;
 -- Grant access only to authenticated users (Supabase role)
-GRANT SELECT ON public.profiles_public TO anon;
+GRANT SELECT ON public.profiles_public TO authenticated;
 
 -- =========================
 -- Indexes
