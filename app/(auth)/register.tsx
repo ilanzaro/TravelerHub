@@ -1,5 +1,7 @@
 import { radixColors } from "@/_constants/colors";
 import { SelectedTags, tagCategories } from "@/_constants/tags";
+import { useAuthStore } from "@/stores/authStore";
+import { useProfileStore } from "@/stores/profilesStore";
 import { LinearGradient } from "expo-linear-gradient";
 import { Link, router } from "expo-router";
 import React, { useState } from "react";
@@ -31,7 +33,11 @@ type RegisterFormData = {
 export default function Register() {
   const colorScheme = useColorScheme();
   const theme = radixColors[colorScheme ?? "dark"];
-  const [activeTab, setActiveTab] = useState<"email" | "gmail">("email");
+
+  const [activeTab, setActiveTab] = useState<"email" | "google">("email");
+  const [googleConnected, setGoogleConnected] = useState(false);
+  const { createProfile } = useProfileStore();
+  const { signIn, signInGoogleVerify } = useAuthStore();
 
   const {
     control,
@@ -59,68 +65,85 @@ export default function Register() {
 
   const selectedTags = watch("selectedTags");
 
+  /* --------------------------------
+   * GOOGLE – PHASE 1 (CONNECT ONLY)
+   * -------------------------------- */
+  const handleGoogleConnect = async () => {
+    try {
+      const user = await signInGoogleVerify();
+
+      if (user?.email) {
+        setValue("email", user.email);
+      }
+
+      setGoogleConnected(true);
+
+      Alert.alert(
+        "Google connected",
+        "Please complete the remaining fields and create your account"
+      );
+    } catch (e: any) {
+      Alert.alert("Google authentication failed", e.message);
+    }
+  };
+
+  /* --------------------------------
+   * SUBMIT
+   * -------------------------------- */
   const onSubmit = async (data: RegisterFormData) => {
     try {
-      // Simulate API call with form data including tags
-      console.log("Registration data:", data);
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      if (!data.nickname) {
+        Alert.alert("Nickname is required");
+        return;
+      }
 
-      Alert.alert("Success", "Account created successfully!", [
-        {
-          text: "OK",
-          onPress: () => router.replace("/(tabs)/radar"),
-        },
-      ]);
-    } catch {
-      Alert.alert("Error", "Registration failed. Please try again.");
+      if (activeTab === "email") {
+        if (data.password !== data.repeatPassword) {
+          Alert.alert("Passwords do not match");
+          return;
+        }
+
+        await signIn(data.email, data.password);
+
+        await createProfile({
+          nickname: data.nickname,
+          birth_date: data.dateOfBirth,
+          last_location: data.location,
+          bio: data.bio,
+          tags: data.selectedTags,
+          provider: "email",
+        });
+      }
+
+      if (activeTab === "google") {
+        if (!googleConnected) {
+          Alert.alert("Please connect your Google account first");
+          return;
+        }
+      }
+
+      router.replace("/(tabs)/radar");
+    } catch (e: any) {
+      Alert.alert("Signup failed", e.message);
     }
   };
 
-  const handleGmailAuth = async () => {
-    try {
-      // Simulate Gmail OAuth call
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-
-      Alert.alert("Success", "Connected with Gmail successfully!", [
-        {
-          text: "OK",
-          onPress: () => router.replace("/(tabs)/radar"),
-        },
-      ]);
-    } catch {
-      Alert.alert("Error", "Gmail authentication failed. Please try again.");
-    }
-  };
-
-  const handleBackToLogin = () => {
-    router.back();
-  };
+  const handleBackToLogin = () => router.back();
 
   const handleTagToggle = (category: keyof SelectedTags, tag: string) => {
     if (category === "travel-style") {
-      // Single selection: toggle or set
-      setValue(
-        "selectedTags",
-        {
-          ...selectedTags,
-          [category]: selectedTags[category] === tag ? null : tag,
-        },
-        { shouldDirty: true }
-      );
+      setValue("selectedTags", {
+        ...selectedTags,
+        [category]: selectedTags[category] === tag ? null : tag,
+      });
     } else {
-      // Multi selection: add or remove
-      const currentTags = selectedTags[category];
-      const isSelected = currentTags.includes(tag);
-      setValue(
-        "selectedTags",
-        {
-          ...selectedTags,
-          [category]: isSelected
-            ? currentTags.filter((t) => t !== tag)
-            : [...currentTags, tag],
-        },
-        { shouldDirty: true }
-      );
+      const current = selectedTags[category];
+      setValue("selectedTags", {
+        ...selectedTags,
+        [category]: current.includes(tag)
+          ? current.filter((t) => t !== tag)
+          : [...current, tag],
+      });
     }
   };
 
@@ -130,7 +153,6 @@ export default function Register() {
     }
     return selectedTags[category].includes(tag);
   };
-
   return (
     <LinearGradient
       colors={[theme.background[4], theme.background[1]]}
@@ -160,7 +182,7 @@ export default function Register() {
             </Text>
           </View>
 
-          {/* Authentication Card with Tabs */}
+          {/* AUTH CARD */}
           <View
             style={[
               styles.card,
@@ -170,7 +192,6 @@ export default function Register() {
               },
             ]}
           >
-            {/* Tab Selector */}
             <View
               style={[
                 styles.tabContainer,
@@ -207,15 +228,14 @@ export default function Register() {
 
               <TouchableOpacity
                 style={styles.tab}
-                onPress={() => setActiveTab("gmail")}
-                disabled={isSubmitting}
+                onPress={() => setActiveTab("google")}
               >
                 <Text
                   style={[
                     styles.tabText,
                     {
                       color:
-                        activeTab === "gmail"
+                        activeTab === "google"
                           ? theme.text[4]
                           : theme.text["alpha-1"],
                     },
@@ -223,7 +243,7 @@ export default function Register() {
                 >
                   Gmail
                 </Text>
-                {activeTab === "gmail" && (
+                {activeTab === "google" && (
                   <View
                     style={[
                       styles.tabIndicator,
@@ -234,7 +254,6 @@ export default function Register() {
               </TouchableOpacity>
             </View>
 
-            {/* Tab Content */}
             <View style={styles.tabContent}>
               {activeTab === "email" ? (
                 <>
@@ -340,7 +359,7 @@ export default function Register() {
                     <Controller
                       control={control}
                       name="nickname"
-                      render={({ field: { onChange, onBlur, value } }) => (
+                      render={({ field: { onChange, value } }) => (
                         <TextInput
                           style={[
                             styles.input,
@@ -352,11 +371,8 @@ export default function Register() {
                           ]}
                           value={value}
                           onChangeText={onChange}
-                          onBlur={onBlur}
                           placeholder="Choose a nickname"
                           placeholderTextColor={theme.text["alpha-1"]}
-                          autoCapitalize="none"
-                          editable={!isSubmitting}
                         />
                       )}
                     />
@@ -366,10 +382,10 @@ export default function Register() {
                     style={[
                       styles.gmailButton,
                       { backgroundColor: theme.solid[2] },
-                      isSubmitting && styles.disabledButton,
+                      googleConnected && styles.disabledButton,
                     ]}
-                    onPress={handleGmailAuth}
-                    disabled={isSubmitting}
+                    onPress={handleGoogleConnect}
+                    disabled={googleConnected}
                   >
                     <Text
                       style={[
@@ -377,7 +393,9 @@ export default function Register() {
                         { color: theme.background[1] },
                       ]}
                     >
-                      {isSubmitting ? "Connecting..." : "Connect with Gmail"}
+                      {googleConnected
+                        ? "Google Connected ✓"
+                        : "Connect with Gmail"}
                     </Text>
                   </TouchableOpacity>
                 </>

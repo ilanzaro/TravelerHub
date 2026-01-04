@@ -1,4 +1,6 @@
 import { radixColors } from "@/_constants/colors";
+import { signInWithGoogle } from "@/lib/auth/googleAuth";
+import { useAuthStore } from "@/stores/authStore";
 import { LinearGradient } from "expo-linear-gradient";
 import { Link, router } from "expo-router";
 import React, { useState } from "react";
@@ -24,6 +26,7 @@ export default function Login() {
   const colorScheme = useColorScheme();
   const theme = radixColors[colorScheme ?? "dark"];
   const [activeTab, setActiveTab] = useState<"email" | "gmail">("email");
+  const { signIn } = useAuthStore();
 
   const {
     control,
@@ -39,9 +42,8 @@ export default function Login() {
   const onSubmit = async (data: LoginFormData) => {
     try {
       // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      // Navigate to main app on success
+      // await new Promise((resolve) => setTimeout(resolve, 1000));
+      await signIn(data.email, data.password);
       router.replace("/(tabs)/radar");
     } catch (error) {
       console.error("Login error:", error);
@@ -55,11 +57,10 @@ export default function Login() {
 
   const handleGmailAuth = async () => {
     try {
-      // Simulate Gmail OAuth call
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-
-      // Navigate to main app on success
-      router.replace("/(tabs)/radar");
+      // Simulate API call
+      // await new Promise((resolve) => setTimeout(resolve, 1000));
+      await signInWithGoogle();
+      // Navigation will be handled by auth state change
     } catch (error) {
       console.error("Gmail auth error:", error);
       Alert.alert("Error", "Gmail authentication failed. Please try again.");

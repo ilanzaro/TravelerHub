@@ -7,6 +7,15 @@ import type {
 import { supabase } from "@/lib/supabase";
 import { create } from "zustand";
 
+type CreateProfileInput = {
+  nickname: string;
+  birth_date: string;
+  bio?: string;
+  last_location?: string;
+  tags?: any;
+  provider: "email" | "google";
+};
+
 type ProfileState = {
   myProfile?: Profile;
   nearbyProfiles: PublicProfile[];
@@ -22,6 +31,7 @@ type ProfileState = {
   ) => Promise<void>;
   fetchFavorites: (lng?: number, lat?: number) => Promise<void>;
   fetchProfileViewers: () => Promise<void>;
+  createProfile: (data: CreateProfileInput) => Promise<void>;
   reset: () => void;
 };
 
@@ -37,7 +47,11 @@ export const useProfileStore = create<ProfileState>((set, get) => ({
     const {
       data: { user },
     } = await supabase.auth.getUser();
-    if (!user) return set({ isLoading: false });
+
+    if (!user) {
+      set({ isLoading: false });
+      return;
+    }
 
     const { data, error } = await supabase
       .from("profiles")
@@ -85,6 +99,38 @@ export const useProfileStore = create<ProfileState>((set, get) => ({
 
     if (error) console.error(error);
     set({ profileViewers: data ?? [] });
+  },
+  createProfile: async (input) => {
+    set({ isLoading: true });
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      set({ isLoading: false });
+      throw new Error("User not authenticated");
+    }
+
+    const { error } = await supabase.from("profiles").insert({
+      id: user.id,
+      email: user.email,
+      provider: input.provider,
+      email_verified: !!user.email_confirmed_at,
+      nickname: input.nickname,
+      birth_date: input.birth_date,
+      bio: input.bio,
+      last_location: input.last_location,
+      tags: input.tags,
+    });
+
+    if (error) {
+      set({ isLoading: false });
+      throw error;
+    }
+
+    await get().fetchMyProfile();
+    set({ isLoading: false });
   },
 
   reset: () =>
