@@ -16,6 +16,7 @@ CREATE TABLE profiles (
     settings_show_age BOOLEAN DEFAULT true,         -- if false, birth_date will not be exposed publicly
     settings_theme TEXT DEFAULT 'auto',             -- light | dark | auto
     settings_show_distance BOOLEAN DEFAULT true,    -- if false, last_location will not be exposed publicly
+    settings_show_units TEXT DEFAULT 'metric',      -- 'metric' | 'imperial' for user measurement preference
 
     -- Auth metadata
     provider TEXT DEFAULT 'email',            -- email | google
@@ -41,6 +42,9 @@ CREATE TABLE profiles (
     -- ✅ Constraints
     CONSTRAINT check_settings_theme
         CHECK (settings_theme IN ('light', 'dark', 'auto')),
+
+    CONSTRAINT check_settings_show_units
+        CHECK (settings_show_units IN ('metric', 'imperial')),
 
     CONSTRAINT check_travel_style_exists
         CHECK (tags ? 'travel-style' AND jsonb_typeof(tags->'travel-style') = 'string'),
@@ -156,9 +160,11 @@ AS $$
 $$;
 
 -- =========================
--- Auto-create profile on signup
+-- Note:
+-- Profile creation on signup is now handled by the application
+-- The previous trigger handle_new_user has been removed.
 -- =========================
-CREATE OR REPLACE FUNCTION public.handle_new_user()
+/* CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS trigger
 LANGUAGE plpgsql
 SECURITY DEFINER
@@ -174,4 +180,4 @@ $$;
 CREATE TRIGGER on_auth_user_created
 AFTER INSERT ON auth.users
 FOR EACH ROW
-EXECUTE FUNCTION public.handle_new_user();
+EXECUTE FUNCTION public.handle_new_user(); */

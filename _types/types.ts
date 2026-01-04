@@ -8,6 +8,7 @@ export type Profile = {
   settings_show_age: boolean;
   settings_theme: "light" | "dark" | "auto";
   settings_show_distance: boolean;
+  settings_units: "metric" | "imperial";
   provider: "email" | "google";
   email_verified: boolean;
   tags: Record<string, any>;
