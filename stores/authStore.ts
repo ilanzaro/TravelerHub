@@ -14,7 +14,7 @@ type AuthState = {
 
   fetchSession: () => Promise<void>;
   signIn: (email: string, password: string) => Promise<void>;
-  signInGoogleVerify: () => Promise<User>;
+  signInGoogleVerify: () => Promise<void>;
   signOut: () => Promise<void>;
 };
 
@@ -57,30 +57,12 @@ export const useAuthStore = create<AuthState>((set) => ({
       provider: "google",
       options: { redirectTo },
     });
-    console.log("signInGoogleVerify data:", data, "error:", error);
+    //auth listener will update the user state
     if (error) throw error;
 
     if (Platform.OS !== "web" && data?.url) {
       await WebBrowser.openAuthSessionAsync(data.url, redirectTo);
     }
-
-    // After redirect, Supabase updates the session internally
-    const {
-      data: { session },
-      error: sessionError,
-    } = await supabase.auth.getSession();
-
-    if (sessionError) throw sessionError;
-    if (!session?.user) throw new Error("Google authentication failed");
-
-    // Update auth store
-    set({
-      session,
-      user: session.user,
-      initialized: true,
-    });
-
-    // DO NOT create profile here
-    return session.user;
+    return;
   },
 }));
