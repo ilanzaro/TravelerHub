@@ -70,10 +70,10 @@ export default function Register() {
    * -------------------------------- */
   const handleGoogleConnect = async () => {
     try {
-      const user = await signInGoogleVerify();
+      const googleUser = await signInGoogleVerify();
 
-      if (user?.email) {
-        setValue("email", user.email);
+      if (googleUser?.email) {
+        setValue("email", googleUser.email);
       }
 
       setGoogleConnected(true);
@@ -120,6 +120,27 @@ export default function Register() {
           Alert.alert("Please connect your Google account first");
           return;
         }
+
+        await createProfile({
+          nickname: data.nickname,
+          birth_date: data.dateOfBirth,
+          last_location: data.location,
+          bio: data.bio,
+          tags: data.selectedTags,
+          provider: "google",
+        });
+      }
+
+      // Safety check: only navigate if both user and profile exist
+      const authUser = useAuthStore.getState().user;
+      const profile = useProfileStore.getState().myProfile;
+
+      if (!authUser || !profile) {
+        Alert.alert(
+          "Incomplete Setup",
+          "Your account or profile is not ready yet."
+        );
+        return;
       }
 
       router.replace("/(tabs)/radar");

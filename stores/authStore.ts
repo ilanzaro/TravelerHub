@@ -51,11 +51,15 @@ export const useAuthStore = create<AuthState>((set) => ({
     set({ session: null, user: null });
   },
   signInGoogleVerify: async () => {
-    const redirectTo = Linking.createURL("/");
+    console.log("Starting Google OAuth flow...");
+    const redirectTo = Linking.createURL("auth/callback");
 
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: "google",
-      options: { redirectTo },
+      options: {
+        redirectTo,
+        skipBrowserRedirect: Platform.OS !== "web",
+      },
     });
 
     if (error) throw error;
