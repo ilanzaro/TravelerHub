@@ -1,6 +1,6 @@
 import { radixColors } from "@/_constants/colors";
-import { signInWithGoogle } from "@/lib/auth/googleAuth";
 import { useAuthStore } from "@/stores/authStore";
+import { useProfileStore } from "@/stores/profilesStore";
 import { LinearGradient } from "expo-linear-gradient";
 import { Link, router } from "expo-router";
 import React, { useState } from "react";
@@ -25,8 +25,10 @@ type LoginFormData = {
 export default function Login() {
   const colorScheme = useColorScheme();
   const theme = radixColors[colorScheme ?? "dark"];
-  const [activeTab, setActiveTab] = useState<"email" | "gmail">("email");
-  const { signIn } = useAuthStore();
+  const [activeTab, setActiveTab] = useState<"email" | "google">("email");
+
+  const { signIn, signInGoogleVerify } = useAuthStore();
+  const { fetchMyProfile, myProfile } = useProfileStore();
 
   const {
     control,
@@ -39,32 +41,65 @@ export default function Login() {
     },
   });
 
+  /* -----------------------------
+   * Email login
+   * ----------------------------- */
   const onSubmit = async (data: LoginFormData) => {
     try {
-      // Simulate API call
-      // await new Promise((resolve) => setTimeout(resolve, 1000));
       await signIn(data.email, data.password);
+
+      // fetch profile after login
+      await fetchMyProfile();
+
+      if (!useAuthStore.getState().user || !myProfile) {
+        Alert.alert(
+          "Profile Missing",
+          "Your account is missing a profile. Please complete registration first."
+        );
+        return;
+      }
+
       router.replace("/(tabs)/radar");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Login error:", error);
-      Alert.alert("Error", "Login failed. Please try again.");
+      Alert.alert("Error", error.message || "Login failed. Please try again.");
+    }
+  };
+
+  /* -----------------------------
+   * Gmail login
+   * ----------------------------- */
+  const handleGoogleAuth = async () => {
+    try {
+      const user = await signInGoogleVerify(); // returns User | null
+      if (!user) {
+        Alert.alert("Error", "Google authentication failed.");
+        return;
+      }
+
+      // fetch the user's profile from Supabase
+      await fetchMyProfile();
+
+      if (!myProfile) {
+        Alert.alert(
+          "Profile Missing",
+          "Please complete your profile before continuing."
+        );
+        return;
+      }
+
+      router.replace("/(tabs)/radar");
+    } catch (error: any) {
+      console.error("Gmail auth error:", error);
+      Alert.alert(
+        "Error",
+        error.message || "Gmail authentication failed. Please try again."
+      );
     }
   };
 
   const handleForgotPassword = () => {
     Alert.alert("Forgot Password", "Password reset functionality coming soon!");
-  };
-
-  const handleGmailAuth = async () => {
-    try {
-      // Simulate API call
-      // await new Promise((resolve) => setTimeout(resolve, 1000));
-      await signInWithGoogle();
-      // Navigation will be handled by auth state change
-    } catch (error) {
-      console.error("Gmail auth error:", error);
-      Alert.alert("Error", "Gmail authentication failed. Please try again.");
-    }
   };
 
   return (
@@ -130,7 +165,7 @@ export default function Login() {
 
               <TouchableOpacity
                 style={styles.tab}
-                onPress={() => setActiveTab("gmail")}
+                onPress={() => setActiveTab("google")}
                 disabled={isSubmitting}
               >
                 <Text
@@ -138,7 +173,7 @@ export default function Login() {
                     styles.tabText,
                     {
                       color:
-                        activeTab === "gmail"
+                        activeTab === "google"
                           ? theme.text[4]
                           : theme.text["alpha-1"],
                     },
@@ -146,7 +181,7 @@ export default function Login() {
                 >
                   Gmail
                 </Text>
-                {activeTab === "gmail" && (
+                {activeTab === "google" && (
                   <View
                     style={[
                       styles.tabIndicator,
@@ -168,9 +203,7 @@ export default function Login() {
                     <Controller
                       control={control}
                       name="email"
-                      rules={{
-                        required: "Email is required",
-                      }}
+                      rules={{ required: "Email is required" }}
                       render={({ field: { onChange, onBlur, value } }) => (
                         <TextInput
                           style={[
@@ -281,22 +314,22 @@ export default function Login() {
               ) : (
                 <>
                   <Text
-                    style={[styles.gmailDescription, { color: theme.text[1] }]}
+                    style={[styles.googleDescription, { color: theme.text[1] }]}
                   >
                     Sign in quickly with your Gmail account
                   </Text>
                   <TouchableOpacity
                     style={[
-                      styles.gmailButton,
+                      styles.googleButton,
                       { backgroundColor: theme.solid[2] },
                       isSubmitting && styles.disabledButton,
                     ]}
-                    onPress={handleGmailAuth}
+                    onPress={handleGoogleAuth}
                     disabled={isSubmitting}
                   >
                     <Text
                       style={[
-                        styles.gmailButtonText,
+                        styles.googleButtonText,
                         { color: theme.background[1] },
                       ]}
                     >
@@ -406,19 +439,19 @@ const styles = StyleSheet.create({
     marginTop: -10,
     marginBottom: 32,
   },
-  gmailDescription: {
+  googleDescription: {
     fontSize: 15,
     textAlign: "center",
     marginBottom: 20,
     opacity: 0.8,
   },
-  gmailButton: {
+  googleButton: {
     height: 50,
     borderRadius: 12,
     justifyContent: "center",
     alignItems: "center",
   },
-  gmailButtonText: {
+  googleButtonText: {
     fontSize: 16,
     fontWeight: "600",
   },
