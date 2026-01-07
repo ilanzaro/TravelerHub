@@ -71,16 +71,33 @@ export default function Login() {
    * ----------------------------- */
   const handleGoogleAuth = async () => {
     try {
-      const user = await signInGoogleVerify();
+      console.log("Starting Gmail auth...");
+
+      // <-- This is where the call goes
+      const user = await signInGoogleVerify(); // returns User | null
       if (!user) {
-        Alert.alert("Error", "Google authentication failed.");
+        Alert.alert("Error", "Google login failed");
         return;
       }
 
+      // fetch the user's profile from Supabase
       await fetchMyProfile();
+
+      if (!myProfile) {
+        Alert.alert(
+          "Profile Missing",
+          "Please complete your profile before continuing."
+        );
+        return;
+      }
+
       router.replace("/(tabs)/radar");
     } catch (error: any) {
-      Alert.alert("Error", error?.message || "Authentication failed");
+      console.error("Gmail auth error:", error);
+      Alert.alert(
+        "Error",
+        error.message || "Gmail authentication failed. Please try again."
+      );
     }
   };
 

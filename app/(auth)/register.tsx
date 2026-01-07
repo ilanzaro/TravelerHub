@@ -71,11 +71,13 @@ export default function Register() {
   const handleGoogleConnect = async () => {
     try {
       const googleUser = await signInGoogleVerify();
-
-      if (googleUser?.email) {
-        setValue("email", googleUser.email);
+      if (!googleUser?.email) {
+        Alert.alert("Error", "Google authentication failed");
+        return;
       }
 
+      // Pre-fill email field
+      setValue("email", googleUser.email);
       setGoogleConnected(true);
 
       Alert.alert(

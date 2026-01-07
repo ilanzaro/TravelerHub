@@ -65,13 +65,23 @@ export const useAuthStore = create<AuthState>((set) => ({
     if (error) throw error;
 
     if (Platform.OS !== "web" && data?.url) {
-      await WebBrowser.openAuthSessionAsync(data.url, redirectTo);
+      const result = await WebBrowser.openAuthSessionAsync(
+        data.url,
+        redirectTo
+      );
+      console.log("OAuth session result:", result);
     }
 
     const {
       data: { session },
     } = await supabase.auth.getSession();
 
-    return session?.user ?? null;
+    if (!session?.user) {
+      console.warn("No user session found after OAuth");
+      return null;
+    }
+
+    set({ session, user: session.user });
+    return session.user;
   },
 }));
