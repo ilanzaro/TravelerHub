@@ -14,7 +14,7 @@ type AuthState = {
 
   fetchSession: () => Promise<void>;
   signIn: (email: string, password: string) => Promise<void>;
-  signInGoogleVerify: () => Promise<void>;
+  signInGoogleVerify: () => Promise<User | null>;
   signOut: () => Promise<void>;
 };
 
@@ -57,12 +57,17 @@ export const useAuthStore = create<AuthState>((set) => ({
       provider: "google",
       options: { redirectTo },
     });
-    //auth listener will update the user state
+
     if (error) throw error;
 
     if (Platform.OS !== "web" && data?.url) {
       await WebBrowser.openAuthSessionAsync(data.url, redirectTo);
     }
-    return;
+
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+
+    return session?.user ?? null;
   },
 }));

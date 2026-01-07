@@ -590,26 +590,24 @@ export default function Register() {
             </View>
           </View>
 
-          {activeTab === "email" && (
-            <TouchableOpacity
+          <TouchableOpacity
+            style={[
+              styles.registerButton,
+              { backgroundColor: theme.solid[2] },
+              isSubmitting && styles.disabledButton,
+            ]}
+            onPress={handleSubmit(onSubmit)}
+            disabled={isSubmitting}
+          >
+            <Text
               style={[
-                styles.registerButton,
-                { backgroundColor: theme.solid[2] },
-                isSubmitting && styles.disabledButton,
+                styles.registerButtonText,
+                { color: theme.background[1] },
               ]}
-              onPress={handleSubmit(onSubmit)}
-              disabled={isSubmitting}
             >
-              <Text
-                style={[
-                  styles.registerButtonText,
-                  { color: theme.background[1] },
-                ]}
-              >
-                {isSubmitting ? "Creating Account..." : "Create Account"}
-              </Text>
-            </TouchableOpacity>
-          )}
+              {isSubmitting ? "Creating Account..." : "Create Account"}
+            </Text>
+          </TouchableOpacity>
 
           <View style={styles.footer}>
             <Text style={[styles.footerText, { color: theme.text[1] }]}>

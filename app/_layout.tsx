@@ -17,7 +17,6 @@ export default function RootLayout() {
   console.log("session", session);
   if (!initialized) return null;
   const isLoggedIn = !!session;
-  //const isLoggedIn = true;
 
   return (
     <>
