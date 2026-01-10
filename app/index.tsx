@@ -1,4 +1,5 @@
 import { radixColors } from "@/_constants/colors";
+import Auth from "@/components/Auth";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import {
@@ -33,6 +34,9 @@ export default function Index() {
           <Text style={[styles.subtitle, { color: theme.text[1] }]}>
             Connect with travelers around the world
           </Text>
+        </View>
+        <View>
+          <Auth />
         </View>
         <View style={styles.buttonContainer}>
           <TouchableOpacity
