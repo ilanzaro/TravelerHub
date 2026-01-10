@@ -1,5 +1,5 @@
 import { radixColors } from "@/_constants/colors";
-import Auth from "@/components/Auth";
+import GoogleSignIn from "@/components/Auth";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import {
@@ -36,7 +36,7 @@ export default function Index() {
           </Text>
         </View>
         <View>
-          <Auth />
+          <GoogleSignIn />
         </View>
         <View style={styles.buttonContainer}>
           <TouchableOpacity
