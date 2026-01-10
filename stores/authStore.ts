@@ -12,7 +12,7 @@ type AuthState = {
   user: User | null;
   initialized: boolean;
 
-  fetchSession: () => Promise<void>;
+  fetchSession: () => Promise<User | null>;
   signIn: (email: string, password: string) => Promise<void>;
   signInGoogleVerify: () => Promise<User | null>;
   signOut: () => Promise<void>;
@@ -23,7 +23,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   user: null,
   initialized: false,
 
-  fetchSession: async () => {
+  fetchSession: async (): Promise<User | null> => {
     const {
       data: { session },
     } = await supabase.auth.getSession();
@@ -33,25 +33,21 @@ export const useAuthStore = create<AuthState>((set) => ({
       user: session?.user ?? null,
       initialized: true,
     });
+
+    return session?.user ?? null;
   },
 
-  signIn: async (email, password) => {
+  signIn: async (email: string, password: string): Promise<void> => {
     const { error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
     if (error) throw error;
+
     await useAuthStore.getState().fetchSession();
   },
 
-  signOut: async () => {
-    await supabase.auth.signOut();
-    useProfileStore.getState().reset();
-    useChatStore.getState().reset();
-    set({ session: null, user: null });
-  },
-  signInGoogleVerify: async () => {
-    console.log("Starting Google OAuth flow...");
+  signInGoogleVerify: async (): Promise<User | null> => {
     const redirectTo = Linking.createURL("auth/callback");
 
     const { data, error } = await supabase.auth.signInWithOAuth({
@@ -65,23 +61,22 @@ export const useAuthStore = create<AuthState>((set) => ({
     if (error) throw error;
 
     if (Platform.OS !== "web" && data?.url) {
-      const result = await WebBrowser.openAuthSessionAsync(
-        data.url,
-        redirectTo
-      );
-      console.log("OAuth session result:", result);
+      await WebBrowser.openAuthSessionAsync(data.url, redirectTo);
     }
 
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
+    await supabase.auth.refreshSession();
 
-    if (!session?.user) {
-      console.warn("No user session found after OAuth");
-      return null;
-    }
+    return await useAuthStore.getState().fetchSession();
+  },
 
-    set({ session, user: session.user });
-    return session.user;
+  signOut: async (): Promise<void> => {
+    await supabase.auth.signOut();
+    useProfileStore.getState().reset();
+    useChatStore.getState().reset();
+
+    set({
+      session: null,
+      user: null as User | null,
+    });
   },
 }));

@@ -34,10 +34,13 @@ export default function Register() {
   const colorScheme = useColorScheme();
   const theme = radixColors[colorScheme ?? "dark"];
 
-  const [activeTab, setActiveTab] = useState<"email" | "google">("email");
+  //const [activeTab, setActiveTab] = useState<"email" | "google">("email");
   const [googleConnected, setGoogleConnected] = useState(false);
   const { createProfile } = useProfileStore();
-  const { signIn, signInGoogleVerify } = useAuthStore();
+  const { signIn, signInGoogleVerify, user: authUser } = useAuthStore();
+  const [activeTab, setActiveTab] = useState<"email" | "google">(
+    authUser?.app_metadata?.provider === "google" ? "google" : "email"
+  );
 
   const {
     control,
@@ -47,7 +50,7 @@ export default function Register() {
     formState: { isSubmitting },
   } = useForm<RegisterFormData>({
     defaultValues: {
-      email: "",
+      email: authUser?.email ?? "",
       password: "",
       repeatPassword: "",
       nickname: "",
@@ -66,7 +69,7 @@ export default function Register() {
   const selectedTags = watch("selectedTags");
 
   /* --------------------------------
-   * GOOGLE – PHASE 1 (CONNECT ONLY)
+   * GOOGLE – CONNECT ONLY
    * -------------------------------- */
   const handleGoogleConnect = async () => {
     try {
@@ -76,7 +79,7 @@ export default function Register() {
         return;
       }
 
-      // Pre-fill email field
+      // Pre-fill email field and disable editing
       setValue("email", googleUser.email);
       setGoogleConnected(true);
 
@@ -134,7 +137,6 @@ export default function Register() {
       }
 
       // Safety check: only navigate if both user and profile exist
-      const authUser = useAuthStore.getState().user;
       const profile = useProfileStore.getState().myProfile;
 
       if (!authUser || !profile) {
@@ -176,6 +178,7 @@ export default function Register() {
     }
     return selectedTags[category].includes(tag);
   };
+
   return (
     <LinearGradient
       colors={[theme.background[4], theme.background[1]]}
@@ -305,73 +308,77 @@ export default function Register() {
                           keyboardType="email-address"
                           autoCapitalize="none"
                           autoCorrect={false}
-                          editable={!isSubmitting}
+                          editable={!isSubmitting && !googleConnected}
                         />
                       )}
                     />
                   </View>
 
-                  <View style={styles.inputContainer}>
-                    <Text style={[styles.label, { color: theme.text[1] }]}>
-                      Password *
-                    </Text>
-                    <Controller
-                      control={control}
-                      name="password"
-                      render={({ field: { onChange, onBlur, value } }) => (
-                        <TextInput
-                          style={[
-                            styles.input,
-                            {
-                              backgroundColor: theme.background[1],
-                              borderColor: theme.border[2],
-                              color: theme.text[2],
-                            },
-                          ]}
-                          value={value}
-                          onChangeText={onChange}
-                          onBlur={onBlur}
-                          placeholder="Create a password"
-                          placeholderTextColor={theme.text["alpha-1"]}
-                          secureTextEntry
-                          autoCapitalize="none"
-                          autoCorrect={false}
-                          editable={!isSubmitting}
+                  {!googleConnected && (
+                    <>
+                      <View style={styles.inputContainer}>
+                        <Text style={[styles.label, { color: theme.text[1] }]}>
+                          Password *
+                        </Text>
+                        <Controller
+                          control={control}
+                          name="password"
+                          render={({ field: { onChange, onBlur, value } }) => (
+                            <TextInput
+                              style={[
+                                styles.input,
+                                {
+                                  backgroundColor: theme.background[1],
+                                  borderColor: theme.border[2],
+                                  color: theme.text[2],
+                                },
+                              ]}
+                              value={value}
+                              onChangeText={onChange}
+                              onBlur={onBlur}
+                              placeholder="Create a password"
+                              placeholderTextColor={theme.text["alpha-1"]}
+                              secureTextEntry
+                              autoCapitalize="none"
+                              autoCorrect={false}
+                              editable={!isSubmitting}
+                            />
+                          )}
                         />
-                      )}
-                    />
-                  </View>
+                      </View>
 
-                  <View style={styles.inputContainer}>
-                    <Text style={[styles.label, { color: theme.text[1] }]}>
-                      Repeat Password *
-                    </Text>
-                    <Controller
-                      control={control}
-                      name="repeatPassword"
-                      render={({ field: { onChange, onBlur, value } }) => (
-                        <TextInput
-                          style={[
-                            styles.input,
-                            {
-                              backgroundColor: theme.background[1],
-                              borderColor: theme.border[2],
-                              color: theme.text[2],
-                            },
-                          ]}
-                          value={value}
-                          onChangeText={onChange}
-                          onBlur={onBlur}
-                          placeholder="Repeat your password"
-                          placeholderTextColor={theme.text["alpha-1"]}
-                          secureTextEntry
-                          autoCapitalize="none"
-                          autoCorrect={false}
-                          editable={!isSubmitting}
+                      <View style={styles.inputContainer}>
+                        <Text style={[styles.label, { color: theme.text[1] }]}>
+                          Repeat Password *
+                        </Text>
+                        <Controller
+                          control={control}
+                          name="repeatPassword"
+                          render={({ field: { onChange, onBlur, value } }) => (
+                            <TextInput
+                              style={[
+                                styles.input,
+                                {
+                                  backgroundColor: theme.background[1],
+                                  borderColor: theme.border[2],
+                                  color: theme.text[2],
+                                },
+                              ]}
+                              value={value}
+                              onChangeText={onChange}
+                              onBlur={onBlur}
+                              placeholder="Repeat your password"
+                              placeholderTextColor={theme.text["alpha-1"]}
+                              secureTextEntry
+                              autoCapitalize="none"
+                              autoCorrect={false}
+                              editable={!isSubmitting}
+                            />
+                          )}
                         />
-                      )}
-                    />
-                  </View>
+                      </View>
+                    </>
+                  )}
                 </>
               ) : (
                 <>
