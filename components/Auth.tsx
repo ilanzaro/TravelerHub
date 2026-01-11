@@ -1,3 +1,4 @@
+import { useAuthStore } from "@/stores/authStore";
 import {
   GoogleSignin,
   GoogleSigninButton,
@@ -19,13 +20,11 @@ import LogoSVG from "../assets/svg/google-icon-logo-svg.svg";
 ======================================================= */
 
 export function GoogleSigninButtonWeb() {
+  const signInGoogleVerify = useAuthStore((state) => state.signInGoogleVerify);
   return (
     <TouchableOpacity
       style={[styles.button, styles.googleButton]}
-      onPress={() => {
-        // Web Google Sign-In logic here
-        console.log("Web Google Sign-In clicked");
-      }}
+      onPress={() => signInGoogleVerify()}
     >
       <View style={styles.googleButtonContent}>
         <LogoSVG width={24} height={24} />{" "}
