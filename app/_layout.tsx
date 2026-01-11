@@ -1,5 +1,5 @@
 import { radixColors } from "@/_constants/colors";
-import { initAuthListener } from "@/lib/auth/auth-init";
+import { initAuthListener, initGoogleSignin } from "@/lib/auth/auth-init";
 import { useAuthStore } from "@/stores/authStore";
 import { Stack } from "expo-router";
 import { useEffect } from "react";
@@ -12,6 +12,7 @@ export default function RootLayout() {
 
   useEffect(() => {
     initAuthListener();
+    initGoogleSignin();
   }, []);
 
   console.log("session", session);

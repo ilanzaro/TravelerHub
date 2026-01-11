@@ -51,11 +51,13 @@ function GoogleSigninButtonNative() {
       await GoogleSignin.hasPlayServices();
       const response = await GoogleSignin.signIn();
       if (isSuccessResponse(response)) {
+        const { idToken } = await GoogleSignin.getTokens();
+        console.log("GoogleSigninButtonNative", idToken);
         console.log(
           "GoogleSigninButtonNative",
           JSON.stringify(response, null, 2)
         );
-        const { idToken } = response.data;
+        //const { idToken } = response.data;
         if (!idToken) throw new Error("No idToken returned from Google Signin");
         const { data, error } = await supabase.auth.signInWithIdToken({
           provider: "google",
