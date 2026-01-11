@@ -54,9 +54,10 @@ export const useAuthStore = create<AuthState>((set) => ({
       provider: "google",
       options: {
         redirectTo,
-        skipBrowserRedirect: Platform.OS !== "web",
+        skipBrowserRedirect: true,
       },
     });
+    console.log("signInGoogleVerify", data);
 
     if (error) throw error;
 

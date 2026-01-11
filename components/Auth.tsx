@@ -1,3 +1,4 @@
+import { supabase } from "@/lib/supabase";
 import { useAuthStore } from "@/stores/authStore";
 import {
   GoogleSignin,
@@ -50,7 +51,17 @@ function GoogleSigninButtonNative() {
       await GoogleSignin.hasPlayServices();
       const response = await GoogleSignin.signIn();
       if (isSuccessResponse(response)) {
-        console.log(JSON.stringify(response.data, null, 2));
+        console.log(
+          "GoogleSigninButtonNative",
+          JSON.stringify(response, null, 2)
+        );
+        const { idToken } = response.data;
+        if (!idToken) throw new Error("No idToken returned from Google Signin");
+        const { data, error } = await supabase.auth.signInWithIdToken({
+          provider: "google",
+          token: idToken || "",
+        });
+        console.log("supabase signInWithIdToken", data, error);
       } else {
         // cancelled
       }
