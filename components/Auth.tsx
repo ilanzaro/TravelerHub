@@ -43,7 +43,7 @@ export function GoogleSigninButtonWeb() {
 
 function GoogleSigninButtonNative() {
   GoogleSignin.configure({
-    webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID || "",
+    webClientId: process.env.GOOGLE_WEB_CLIENT_ID || "",
   });
 
   const onPress = async () => {
